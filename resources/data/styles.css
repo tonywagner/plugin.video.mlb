@@ -185,4 +185,9 @@ h2 {
 
 video {
   width:100%;
+  display:none;
+}
+
+audio {
+  display:none;
 }

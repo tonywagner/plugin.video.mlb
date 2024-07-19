@@ -5,43 +5,52 @@
 <head>
 <body>
 <script>
-let searchParams = new URLSearchParams(window.location.search)
-let stream_url = 'stream.m3u8'
-if (searchParams.has('mediaId')) {
-  stream_url += '?mediaId=' + searchParams.get('mediaId')
-  if (searchParams.has('start')) {
-    stream_url += '&start=' + searchParams.get('start')
-  }
-  if (searchParams.has('skip')) {
-    stream_url += '&skip=' + searchParams.get('skip')
-  }
-}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 <video id="video" controls></video>
+<audio id="audio" controls></audio>
 <span id="audioSpan"></span>
 <button onclick="history.back()">Go Back</button>
 <script>
-  var video = document.getElementById('video');
+  element = 'video'
+  let searchParams = new URLSearchParams(window.location.search)
+  let stream_url = 'stream.m3u8'
+  if (searchParams.has('mediaId')) {
+    stream_url += '?mediaId=' + searchParams.get('mediaId')
+    if (searchParams.has('start')) {
+      stream_url += '&start=' + searchParams.get('start')
+    }
+    if (searchParams.has('skip')) {
+      stream_url += '&skip=' + searchParams.get('skip')
+    }
+    if (searchParams.has('type') && (searchParams.get('type') == 'audio')) {
+      element = 'audio'
+    }
+  }
+  
+  var player = document.getElementById(element);
+  player.style.display = 'block';
   var videoSrc = stream_url;
   if (Hls.isSupported()) {
     var hls = new Hls();
     hls.loadSource(videoSrc);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MEDIA_ATTACHED,function(){video.muted=true;video.play()})
-    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, function() {
-      var audioSpan=document.getElementById("audioSpan")
-      var audioButtons=''
-      for (var i=0;i<hls.audioTracks.length;i++) {
-        audioButtons += '<button id="audioButton' + i + '" class="audioButton'
-        if (i==0) { audioButtons += ' default' }
-        audioButtons += '" onclick="toggleAudio(' + i + ')">' + hls.audioTracks[i]["name"] + "</button> "
-      }
-      audioSpan.innerHTML=audioButtons
-    })
+    hls.attachMedia(player);
+    if ( element == 'video' ) {
+        hls.on(Hls.Events.MEDIA_ATTACHED,function(){player.muted=true;player.play()})
+        hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, function() {
+          var audioSpan=document.getElementById("audioSpan")
+          var audioButtons=''
+          for (var i=0;i<hls.audioTracks.length;i++) {
+            audioButtons += '<button id="audioButton' + i + '" class="audioButton'
+            if (i==0) { audioButtons += ' default' }
+            audioButtons += '" onclick="toggleAudio(' + i + ')">' + hls.audioTracks[i]["name"] + "</button> "
+          }
+          audioSpan.innerHTML=audioButtons
+        })
+    }
   }
   else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-    video.src = videoSrc;
+    player.src = videoSrc;
   }
   
   function toggleAudio(x) {

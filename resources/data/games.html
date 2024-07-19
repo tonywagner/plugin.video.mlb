@@ -43,9 +43,9 @@ window.onclick = function(event) {
 </script>
 <script>
 var all_feeds = []
-function play_stream(mediaId, start='none', skip='none') {
+function play_stream(mediaId, type='video', start='none', skip='none') {
   modal.style.display = "none"
-  window.location.href = '/mlb/embed.html?mediaId=' + mediaId + '&start=' + start + '&skip=' + skip
+  window.location.href = '/mlb/embed.html?mediaId=' + mediaId + '&type=' + type + '&start=' + start + '&skip=' + skip
 }
 
 async function skip_select(mediaId, start) {
@@ -97,7 +97,7 @@ async function show_feeds(game_index) {
     //let button = '<button type="button" class="button" onclick="start_select(this.value)" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"></img><div><p class="title">' + feed['title'] + '</p></div></button>'
     let button = '<button type="button" class="button"'
     if ( feed.hasOwnProperty('mediaId') ) {
-      button += ' onclick="play_stream(this.value)" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"'
+      button += ' onclick="play_stream(this.value,\'' + feed['type'] + '\')" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"'
     }
     button += '></img><div><p class="title">' + feed['title'] + '</p></div></button>'
     document.getElementById('modal-btn-group').innerHTML += button

@@ -23,7 +23,9 @@ Choose any one of these three methods to install and run:
    * Copy ZIP file to your Kodi device if necessary, and then run Kodi and install the ZIP in the Addons section (Kodi will prompt you to allow installing addons from unknown sources)  
    * __**Note:** Windows users must also install the Microsoft Visual C++ Redistributable version 14.40.33810.0 or later__  
 
-2. Python 3.11 or newer
+2. Python (3.11 or newer) with the "requests" module installed  
+   * [Download and install Python 3](https://www.python.org/downloads/) if you don't have it already  
+   * Install the Python "requests" module like `pip install requests` or `pip3 install requests`
    * [Download and unzip the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip)  
    * Run the service script like `python plugin.video.mlb/service.py` or `python3 plugin.video.mlb/service.py`
 

@@ -435,16 +435,19 @@ class Account:
 	    					if 'mediaFeedType' in feed:
 	    						label = feed['mediaFeedType'].capitalize() + ' TV'
 	    						icon = 'video.svg'
+	    						type = 'video'
 	    					else:
 	    						label = feed['type'].capitalize()
 	    						if feed['language'] == 'es':
 	    							label += ' Spanish'
 	    						label += ' Radio'
 	    						icon = 'audio.svg'
+	    						type = 'audio'
 	    					filtered_feed = {
 	    					  'title': feed['callLetters'] + ' (' + label + ')',
 	    					  'icon': icon,
-	    					  'mediaId': feed['mediaId']
+	    					  'mediaId': feed['mediaId'],
+	    					  'type': type
 	    					}
 	    					filtered_feeds.append(filtered_feed)
 	    		if len(filtered_feeds) == 0:
@@ -484,7 +487,7 @@ class Account:
 			navigation = {
 			  'current':
 			  {
-				'title': self.utils.dateToString(self.utils.stringToDate(d, '%Y-%m-%d'), '%A %B %-d, %Y').replace(' 0', ' '),
+				'title': self.utils.dateToString(self.utils.stringToDate(d, '%Y-%m-%d'), '%A %B %d, %Y').replace(' 0', ' '),
 				'date': str(self.utils.stringToDate(d, '%Y-%m-%d'))
 			  },
 			  'previous':
