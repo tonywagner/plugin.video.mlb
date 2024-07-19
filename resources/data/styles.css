@@ -1,0 +1,188 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(143,143,143);
+  background-color: rgb(13,18,20);
+}
+
+a {
+  color: rgb(143,143,143);
+}
+
+a:hover {
+  color: #fff;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 5%; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: rgb(20,25,26);
+  margin: auto;
+  padding: 12px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 700px;
+  color: rgb(143,143,143);
+  border-radius: 12px;
+}
+
+/* The Close Button */
+.close {
+  color: rgb(143,143,143);
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+h2 {
+  font-size:6vw;
+  color: rgb(255,255,71);
+}
+
+#navigation {
+  font-size:5vw;
+}
+
+.btn-group {
+  max-width: 100%;
+}
+
+.btn-group .button {
+  background-color: rgb(10,50,75);
+  border: 1px solid black;
+  //border: none;
+  color: rgb(143,143,143);
+  padding: 10px;
+  text-decoration: none;
+  font-size: 1vw;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+}
+
+.btn-group .button img, .btn-group .button div, .btn-group .button svg {
+  display: inline-block;
+  float: left;
+}
+
+.btn-group .button img {
+  width: 20vw;
+  height: 20vw;
+}
+
+#modal-btn-group img {
+  width: 8vw;
+  height: 8vw;
+}
+
+.btn-group .button p {
+  margin-left: 10px;
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.btn-group .button p.time {
+  font-size: 5vw;
+}
+
+.btn-group .button p.title {
+  font-size: 6vw;
+}
+
+.btn-group .button p.subtitle {
+  font-size: 4vw;
+}
+
+.btn-group .button:not(:last-child) {
+  //border-bottom: none; /* Prevent double borders */
+  margin-bottom: 10px;
+}
+
+.btn-group .button:hover {
+  background-color: rgb(11,104,138);
+  color: white;
+}
+
+.dot {
+  height: 6vw;
+  width: 6vw;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.step {
+  background-color: red;
+}
+
+@media screen and (min-width: 700px) {
+  h2 {
+     font-size: 30px;
+  }
+  
+  #navigation {
+    font-size: 24px
+  }
+
+    .btn-group {
+      max-width: 660px;
+    }
+
+    .btn-group .button {
+      font-size: 12px;
+    }
+
+    .btn-group .button img {
+      max-width: 72px;
+      height: 72px;
+    }
+
+    #modal-btn-group img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .btn-group .button p.time {
+      font-size: 20px;
+    }
+
+    .btn-group .button p.title {
+      font-size: 24px;
+    }
+
+    .btn-group .button p.subtitle {
+      font-size: 16px;
+    }
+
+    .dot {
+      height: 24px;
+      width: 24px;
+    }
+}
+
+video {
+  width:100%;
+}

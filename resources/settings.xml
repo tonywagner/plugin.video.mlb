@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<settings version="1">
+	<section id="plugin.video.mlb">
+	    <category id="account" label="30000" help="30008">
+	      <group id="1" label="">
+            <setting id="mlb_account_email" type="string" label="30002" help="30008">
+                <level>0</level>
+                <default></default>
+                <constraints>
+                    <allowempty>true</allowempty>
+                </constraints>
+                <control type="edit" format="string">
+                    <heading>32003</heading>
+                </control>
+            </setting>
+            <setting id="mlb_account_password" type="string" label="30003" help="30008">
+                <level>0</level>
+                <default></default>
+                <constraints>
+                    <allowempty>true</allowempty>
+                </constraints>
+                <control type="edit" format="string">
+                    <heading>32004</heading>
+                    <hidden>true</hidden>
+                </control>
+            </setting>
+            <setting id="initialize" type="string" visible="false">
+                <level>4</level>
+                <default></default>
+                <constraints>
+                    <allowempty>true</allowempty>
+                </constraints>
+            </setting>
+          </group>
+        </category>
+        <category id="webserver" label="30001" help="30009">
+	      <group id="2" label="">
+            <setting id="local_webserver_port" type="integer" label="30004" help="30010">
+                <level>0</level>
+                <default>5714</default>
+                <constraints>
+                    <allowempty>false</allowempty>
+                </constraints>
+                <control type="edit" format="integer">
+                    <heading>32002</heading>
+                </control>
+            </setting>
+            <setting id="local_webserver_username" type="string" label="30005" help="300011">
+                <level>0</level>
+                <default></default>
+                <constraints>
+                    <allowempty>true</allowempty>
+                </constraints>
+                <control type="edit" format="string">
+                    <heading>32007</heading>
+                </control>
+            </setting>
+            <setting id="local_webserver_password" type="string" label="30006" help="300011">
+                <level>0</level>
+                <default></default>
+                <constraints>
+                    <allowempty>true</allowempty>
+                </constraints>
+                <control type="edit" format="string">
+                    <heading>32004</heading>
+                    <hidden>true</hidden>
+                </control>
+            </setting>
+            <setting id="local_webserver_content_protection_string" type="string" label="30007" help="30012">
+                <level>0</level>
+                <default></default>
+                <constraints>
+                    <allowempty>true</allowempty>
+                </constraints>
+                <control type="edit" format="string">
+                    <heading>32009</heading>
+                    <hidden>true</hidden>
+                </control>
+            </setting>
+          </group>
+        </category>
+	</section>
+</settings>

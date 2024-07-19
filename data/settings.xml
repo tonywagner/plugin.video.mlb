@@ -1,0 +1,8 @@
+<settings version="2">
+    <setting id="mlb_account_email"></setting>
+    <setting id="mlb_account_password"></setting>
+    <setting id="local_webserver_port">5714</setting>
+    <setting id="local_webserver_username" />
+    <setting id="local_webserver_password" />
+    <setting id="local_webserver_content_protection_string" />
+</settings>

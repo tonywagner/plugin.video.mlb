@@ -1,0 +1,104 @@
+# Kodi Media Center language file
+# Addon Name: MLB
+# Addon id: plugin.video.mlb
+# Addon Provider: tonywagner
+msgid ""
+msgstr ""
+"Project-Id-Version: Kodi Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: English (http://www.transifex.com/projects/p/xbmc-addons/language/en/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "General"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Webserver"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Account Email"
+msgstr ""
+
+msgctxt "#30003"
+msgid "Account Password"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Port"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Page Username"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Page Password"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Content Protection String"
+msgstr ""
+
+msgctxt "#30008"
+msgid "An MLB.com account, and optionally a MLB.TV subscription, is required to view some content."
+msgstr ""
+
+msgctxt "#30009"
+msgid "Changing any webserver value requires a Kodi restart to take effect"
+msgstr ""
+
+msgctxt "#30010"
+msgid "You can access the webserver anywhere on your network at http://IP-ADDRESS:PORT"
+msgstr ""
+
+msgctxt "#30011"
+msgid "If set, users will have to enter the page username and password (or include the content protection string in the URL) when they access the webserver"
+msgstr ""
+
+msgctxt "#30012"
+msgid "You can access the webserver without the username/password by including the content protection string in the URL like &content_protect=thisrandomstring"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Log In"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Log Out"
+msgstr ""
+
+msgctxt "#30015"
+msgid "● ○ ○ Choose a feed"
+msgstr ""
+
+msgctxt "#30016"
+msgid "● ● ○ Choose a starting option"
+msgstr ""
+
+msgctxt "#30017"
+msgid "● ● ● Choose a skip option"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Enter your MLB.com account email address"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Enter your MLB.com account password"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Enter Date (DD/MM/YYYY)"
+msgstr ""
+
+
+

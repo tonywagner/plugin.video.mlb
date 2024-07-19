@@ -1,0 +1,68 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="btn-group" id="btn-group"></div>
+<span id="status">
+<form action="/mlb/login" method="post">
+MLB Account Email: <input type="text" name="mlb_account_email"/><br/>
+MLB Account Password: <input type="password" name="mlb_account_password"/><br/>
+<input type="hidden" name="redirect" value="redirect"/>
+<input type="submit" value="Log In">
+</form>
+</span>
+<span id="version"></span>
+
+<script>
+async function update_page() {
+  let status
+  let res = await fetch('/mlb/status')
+  status = await res.text()
+  if ( status ) {
+    document.getElementById('status').innerHTML = status
+  }
+  
+  let version
+  res = await fetch('/mlb/version')
+  version = await res.text()
+  document.getElementById('version').innerHTML = version
+
+  let data
+  res = await fetch('/mlb/menu.json')
+  data = await res.json()
+  for(let i=0;i<data.length;i++) {
+    let item = data[i]
+    let button
+    if ( item.hasOwnProperty('link') ) {
+      button = '<a href="' + item['link'] + '"><button type="button" class="button"><div><p class="title">' + item['title'] + '</p></div></button></a>'
+    } else {
+      button = '<button type="button" class="button"><div><p class="title">' + item['title'] + ' <input type="date" id="datePicker" value="' + new Date().toISOString().substring(0,10) + '"/></p></div></button>'
+    }
+    document.getElementById('btn-group').innerHTML += button
+  }
+  
+  datePicker=document.getElementById("datePicker")
+  datePicker.addEventListener("change",changeDate,false)
+  datePicker.addEventListener("keypress",removeDate,false)
+}
+
+function changeDate(e) {
+  date=datePicker.value
+  window.location.href = '/mlb/games.html?date=' + date
+}
+function removeDate(e) {
+  datePicker.removeEventListener("change",changeDate,false)
+  datePicker.addEventListener("blur",changeDate,false)
+  if (e.keyCode===13) {
+    date=datePicker.value
+    window.location.href = '/mlb/games.html?date=' + date
+  }
+}
+
+var datePicker
+update_page()
+</script>
+</body>
+</html>

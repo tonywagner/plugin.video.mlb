@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.mlb" name="MLB®" version="2024.7.18+omega.1" provider-name="tonywagner">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.requests" />
+        <import addon="inputstream.adaptive"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" />
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="en_GB">Watch highlights and games</summary>
+        <description lang="en_GB">Watch recaps and highlights. Watch free games if logged in with an account, and all non-blackout games with a valid subscription.</description>
+        <disclaimer lang="en_GB">Blackout restrictions apply.</disclaimer>
+        <news>
+            - pre-alpha release: MLB games work
+        </news>
+        <language>en</language>
+        <platform>all</platform>
+        <license>GPL-2.0-or-later</license>
+        <forum></forum>
+        <website>https://www.mlb.com/live-stream-games</website>
+        <source>https://github.com/tonywagner/plugin.video.mlb</source>
+        <assets>
+            <icon>resources/media/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>

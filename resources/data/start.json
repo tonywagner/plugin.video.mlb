@@ -1,0 +1,110 @@
+[
+  {
+    "title": "Beginning",
+    "value": "beginning"
+  },
+  {
+    "title": "Catch Up (highlights then live)",
+    "value": "catchup"
+  },
+  {
+    "title": "Live",
+    "value": "live"
+  },
+  {
+    "title": "Top Inning 1",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 1",
+    "value": "games.json"
+  },
+  {
+    "title": "Top Inning 2",
+    "value": "games.json?date=yesterday"
+  },
+  {
+    "title": "Bottom Inning 2",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 3",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 3",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 4",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 4",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 5",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 5",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 6",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 6",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 7",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 7",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 8",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 8",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 9",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 9",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 10",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 10",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 11",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 11",
+    "value": "games.json?date="
+  },
+  {
+    "title": "Top Inning 12",
+    "value": "blah"
+  },
+  {
+    "title": "Bottom Inning 12",
+    "value": "games.json?date="
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Today's Games",
+    "link": "games.html",
+    "data": "games.json"
+  },
+  {
+    "title": "Yesterday's Games",
+    "link": "games.html?date=yesterday",
+    "data": "games.json?date=yesterday"
+  },
+  {
+    "title": "Go To Date",
+    "data": "games.json?date="
+  }
+]

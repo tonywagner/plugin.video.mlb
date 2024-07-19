@@ -1,0 +1,139 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id="modalheader"></h2>
+    <div class="btn-group" id="modal-btn-group"></div>
+  </div>
+
+</div>
+<!-- The rest -->
+<h2 id="header"></h2>
+<span id="navigation"></span>
+<div class="btn-group" id="btn-group"></div>
+<script>
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+<script>
+var all_feeds = []
+function play_stream(mediaId, start='none', skip='none') {
+  modal.style.display = "none"
+  window.location.href = '/mlb/embed.html?mediaId=' + mediaId + '&start=' + start + '&skip=' + skip
+}
+
+async function skip_select(mediaId, start) {
+  let skip_options
+
+  const res = await fetch('/mlb/skip.json')
+
+  skip_options = await res.json()
+  
+  document.getElementById("modalheader").innerHTML = '<p><span class="dot step"></span><span class="dot step"></span><span class="dot step"></span></p><h2>Select your skip option</h2>'
+  
+  document.getElementById('modal-btn-group').innerHTML = '';
+  for(let i=0;i<skip_options.length;i++) {
+    let skip = skip_options[i]
+    let button = '<button type="button" class="button" onclick="play_stream(\'' + mediaId + '\',\'' + start + '\',\'' + skip['value'] + '\')"><div><p class="title">' + skip['title'] + '</p></div></button>'
+    document.getElementById('modal-btn-group').innerHTML += button
+  }
+  
+  document.getElementById("modalcontent").innerHTML = modal_text
+  modal.style.display = "block"
+}
+async function start_select(mediaId) {
+  let start_options
+
+  const res = await fetch('/mlb/start.json')
+
+  start_options = await res.json()
+  
+  document.getElementById("modalheader").innerHTML = '<p><span class="dot step"></span><span class="dot step"></span><span class="dot"></span></p><h2>Select your starting option</h2>'
+  
+  document.getElementById('modal-btn-group').innerHTML = '';
+  for(let i=0;i<start_options.length;i++) {
+    let start = start_options[i]
+    let button = '<button type="button" class="button" onclick="skip_select(\'' + mediaId + '\',this.value)" value="' + start['value'] + '"><div><p class="title">' + start['title'] + '</p></div></button>'
+    document.getElementById('modal-btn-group').innerHTML += button
+  }
+  
+  document.getElementById("modalcontent").innerHTML = modal_text
+  modal.style.display = "block"
+}
+async function show_feeds(game_index) {
+  let feeds = all_feeds[game_index]
+  
+  document.getElementById("modalheader").innerHTML = '<p><span class="dot step"></span><span class="dot"></span><span class="dot"></span></p><h2>Select your feed</h2>'
+  
+  document.getElementById('modal-btn-group').innerHTML = '';
+  for(let i=0;i<feeds.length;i++) {
+    let feed = feeds[i]
+    //let button = '<button type="button" class="button" onclick="start_select(this.value)" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"></img><div><p class="title">' + feed['title'] + '</p></div></button>'
+    let button = '<button type="button" class="button"'
+    if ( feed.hasOwnProperty('mediaId') ) {
+      button += ' onclick="play_stream(this.value)" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"'
+    }
+    button += '></img><div><p class="title">' + feed['title'] + '</p></div></button>'
+    document.getElementById('modal-btn-group').innerHTML += button
+  }
+  
+  modal.style.display = "block"
+}
+
+async function fetch_games() {
+  let games_url = '/mlb/games.json'
+  let searchParams = new URLSearchParams(window.location.search)
+  if (searchParams.has('date')) {
+    games_url += '?date=' + searchParams.get('date')
+  }
+  
+  let data
+
+  const res = await fetch(games_url)
+
+  data = await res.json()
+
+  let date = data['date']
+  document.getElementById('header').innerHTML = data['navigation']['current']['title']
+  document.getElementById('navigation').innerHTML = '<p><a href="/mlb/games.html?date=' + data['navigation']['previous']['date'] + '">' + data['navigation']['previous']['title'] + '</a> | <a href="/mlb/games.html?date=' + data['navigation']['next']['date'] + '">' + data['navigation']['next']['title'] + '</a></p>'
+  
+  let games = data['games']
+  for(let i=0;i<games.length;i++) {
+    let game = games[i]
+    all_feeds.push(game['feeds'])
+    let button = '<button type="button" class="button" onclick="show_feeds(this.value)" value="' + i + '"><img src="' + game['icon'] + '"/><div><p class="time">' + game['time'] + '</p><p class="title">' + game['title'] + '</p><p class="subtitle">' + game['subtitle'] + '</p></div></button>'
+    document.getElementById('btn-group').innerHTML += button
+  }
+  
+}
+
+fetch_games()
+</script>
+<p><a href="index.html">Return to menu</a></p>
+</body>

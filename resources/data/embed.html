@@ -1,0 +1,57 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+<head>
+<body>
+<script>
+let searchParams = new URLSearchParams(window.location.search)
+let stream_url = 'stream.m3u8'
+if (searchParams.has('mediaId')) {
+  stream_url += '?mediaId=' + searchParams.get('mediaId')
+  if (searchParams.has('start')) {
+    stream_url += '&start=' + searchParams.get('start')
+  }
+  if (searchParams.has('skip')) {
+    stream_url += '&skip=' + searchParams.get('skip')
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<video id="video" controls></video>
+<span id="audioSpan"></span>
+<button onclick="history.back()">Go Back</button>
+<script>
+  var video = document.getElementById('video');
+  var videoSrc = stream_url;
+  if (Hls.isSupported()) {
+    var hls = new Hls();
+    hls.loadSource(videoSrc);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MEDIA_ATTACHED,function(){video.muted=true;video.play()})
+    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, function() {
+      var audioSpan=document.getElementById("audioSpan")
+      var audioButtons=''
+      for (var i=0;i<hls.audioTracks.length;i++) {
+        audioButtons += '<button id="audioButton' + i + '" class="audioButton'
+        if (i==0) { audioButtons += ' default' }
+        audioButtons += '" onclick="toggleAudio(' + i + ')">' + hls.audioTracks[i]["name"] + "</button> "
+      }
+      audioSpan.innerHTML=audioButtons
+    })
+  }
+  else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = videoSrc;
+  }
+  
+  function toggleAudio(x) {
+    var elements=document.getElementsByClassName("audioButton");
+    for (var i=0;i<elements.length;i++) {
+      elements[i].className="audioButton"
+    }
+    document.getElementById("audioButton"+x).className += " default"
+    hls.audioTrack=x
+  }
+</script>
+</body>
+</html>

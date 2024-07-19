@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Skip nothing",
+    "value": "none"
+  },
+  {
+    "title": "Skip breaks",
+    "value": "breaks"
+  },
+  {
+    "title": "Skip breaks and non-action pitches",
+    "value": "pitches"
+  }
+]
