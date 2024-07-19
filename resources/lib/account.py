@@ -479,11 +479,12 @@ class Account:
 	    return filtered_games
 			
 	def get_navigation(self, d):
+		# includes replace function to work around some Python versions not supporting "%-d" for day of month without leading zero
 		try:
 			navigation = {
 			  'current':
 			  {
-				'title': self.utils.dateToString(self.utils.stringToDate(d, '%Y-%m-%d'), '%A %B %-d, %Y'),
+				'title': self.utils.dateToString(self.utils.stringToDate(d, '%Y-%m-%d'), '%A %B %-d, %Y').replace(' 0', ' '),
 				'date': str(self.utils.stringToDate(d, '%Y-%m-%d'))
 			  },
 			  'previous':

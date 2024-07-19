@@ -19,11 +19,12 @@ Choose any one of these three methods to install and run:
 
 1. Kodi version 21 (Omega) or newer  
    * [Download and install Kodi](https://kodi.tv/download/)  
-   * [Download the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/download/latest/plugin.video.mlb.zip)  
-   * Copy ZIP file to your Kodi device if necessary, and then run Kodi and install the ZIP in the Addons section  
+   * [Download the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip)  
+   * Copy ZIP file to your Kodi device if necessary, and then run Kodi and install the ZIP in the Addons section (Kodi will prompt you to allow installing addons from unknown sources)  
+   * __**Note:** Windows users must also install the Microsoft Visual C++ Redistributable version 14.40.33810.0 or later__  
 
 2. Python 3.11 or newer
-   * [Download and unzip the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/download/latest/plugin.video.mlb.zip)  
+   * [Download and unzip the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip)  
    * Run the service script like `python plugin.video.mlb/service.py` or `python3 plugin.video.mlb/service.py`
 
 3. Docker
