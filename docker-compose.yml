@@ -1,0 +1,10 @@
+version: "3"
+services:
+  plugin.video.mlb:
+    image: tonywagner/plugin.video.mlb
+    container_name: plugin.video.mlb
+    environment:
+      - TZ=America/New York
+    ports:
+      - 5714:5714
+    restart: unless-stopped

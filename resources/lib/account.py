@@ -431,7 +431,7 @@ class Account:
 	    		filtered_feeds = []
 	    		for feed_key in self.feed_keys:
 	    			for feed in game[feed_key]:
-	    				if feed['entitled'] == True and feed['mediaState'] != 'MEDIA_OFF':
+	    				if feed['entitled'] == True and feed['mediaState'] != 'MEDIA_OFF' and ('blackedOut' not in feed or feed['blackedOut'] == False):
 	    					if 'mediaFeedType' in feed:
 	    						label = feed['mediaFeedType'].capitalize() + ' TV'
 	    						icon = 'video.svg'

@@ -18,9 +18,9 @@ Blackout restrictions apply.
 Choose any one of these three methods to install and run:
 
 1. Kodi version 21 (Omega) or newer  
-   * [Download and install Kodi](https://kodi.tv/download/)  
-   * [Download the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip)  
-   * Copy ZIP file to your Kodi device if necessary, and then run Kodi and install the ZIP in the Addons section (Kodi will prompt you to allow installing addons from unknown sources)  
+   * [Download and install Kodi](https://kodi.tv/download/) (see this [guide](https://troypoint.com/how-to-install-kodi-on-fire-tv/) for installing on a Fire Stick)  
+   * [Download the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip) and copy to your Kodi device (or just use code 278937 in the Downloader app on your Fire Stick)  
+   * Launch Kodi and install the ZIP in the Addons section (Kodi will prompt you to allow installing addons from unknown sources)  
    * __**Note:** Windows users must also install the Microsoft Visual C++ Redistributable version 14.40.33810.0 or later__  
 
 2. Python (3.11 or newer) with the "requests" module installed  
@@ -30,11 +30,12 @@ Choose any one of these three methods to install and run:
    * Run the service script like `python plugin.video.mlb/service.py` or `python3 plugin.video.mlb/service.py`
 
 3. Docker
-   * Coming soon!  
+   * Download the [docker-compose.yml](https://raw.githubusercontent.com/tonywagner/plugin.video.mlb/master/docker-compose.yml) file, change the time zone in the file to your own, and create and start the container like '''docker compose up --detach'''  
+   * Alternately, you can run the command '''docker run -d --name plugin.video.mlb --env TZ="America/New_York" -p 5714:5714 tonywagner/plugin.video.mlb'''  
 
 # Usage
 
-Once installed, you can access the addon from any web browser on your network at http://IP-ADDRESS:5714 (using the IP address of the device running Kodi or the Python script).
+Once installed, open any web browser on your network and navigate to http://IP-ADDRESS:5714 (using the IP address of the device running Kodi or the Python script).
 
 If you installed within Kodi, you can access it within the Addons section of Kodi too.
 
