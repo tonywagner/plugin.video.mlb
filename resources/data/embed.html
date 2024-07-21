@@ -34,6 +34,9 @@
   if (searchParams.has('skip')) {
     stream_url += '&skip=' + searchParams.get('skip')
   }
+  if (searchParams.has('resolution')) {
+    stream_url += '&resolution=' + searchParams.get('resolution')
+  }
   if (searchParams.has('type') && (searchParams.get('type') == 'audio')) {
     element = 'audio'
   }

@@ -373,6 +373,7 @@ class Account:
 	def proxy_file(self, parsed_qs):
 		token = None
 		skip = None
+		resolution = None
 		if 'mediaId' in parsed_qs or 'teamId' in parsed_qs:
 			if 'mediaId' in parsed_qs:
 				mediaId = parsed_qs['mediaId'][0]
@@ -389,6 +390,17 @@ class Account:
 				token = parsed_qs['token'][0]
 		if 'skip' in parsed_qs:
 			skip = parsed_qs['skip'][0]
+		if 'resolution' in parsed_qs:
+			resolution = parsed_qs['resolution'][0]
+			if resolution == 'best':
+				resolution = '720p60'
+			if resolution.startswith('720p'):
+				if resolution.endswith('p60'):
+					resolution = '720,FRAME-RATE=59'
+				else:
+					resolution = '720,FRAME-RATE=29'
+			else:
+				resolution = resolution[:-1]
 				
 		try:
 			headers = {
@@ -422,11 +434,17 @@ class Account:
 				content = re.sub(r",URI=\"((?:http)([^\"]+))", r""+proxied_url_prefix+r"\g<1>", content, flags=re.M)
 				content_encoding = 'utf8'
 				
+				# if resolution is specified, remove non-matching resolutions from manifest
+				if resolution is not None:
+					content = re.sub(r"^((?:#EXT-X-STREAM-INF:BANDWIDTH=)[\d]+(?:,AVERAGE-BANDWIDTH=)[\d]+(?:,CODECS=\"avc1.)[a-z0-9]+(?:,mp4a.40.2\",RESOLUTION=)[\d]+[x](?!" + resolution + ")[\S]+[\n][\S]+[\n])", r"", content, flags=re.M)
+				
 				# remove subtitles and extraneous lines for Kodi Inputstream Adaptive compatibility
 				content = re.sub(r"(?:#EXT-X-MEDIA:TYPE=SUBTITLES[\S]+\n)", r"", content, flags=re.M)
 				content = re.sub(r"(?:#EXT-X-I-FRAME-STREAM-INF:[\S]+\n)", r"", content, flags=re.M)
+				# remove all segments between attempted commercial insertions, if requested
 				if skip == 'commercials':
 					content = re.sub(r"^(#EXT-OATCLS-SCTE35[\S\s]+?#EXT-X-CUE-IN)", r"#EXT-X-DISCONTINUITY", content, flags=re.M)
+				# otherwise, just remove insertion tag lines
 				else:
 					content = re.sub(r"^(?:#EXT-OATCLS-SCTE35:[\S]+\n)", r"", content, flags=re.M)
 					content = re.sub(r"^(?:#EXT-X-CUE-[\S]+\n)", r"", content, flags=re.M)
