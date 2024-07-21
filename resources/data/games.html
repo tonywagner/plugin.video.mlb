@@ -78,10 +78,10 @@ async function start_select(mediaId, type, state) {
   document.getElementById('modal-btn-group').innerHTML = '';
   for(let i=0;i<start_options.length;i++) {
     let start = start_options[i]
-    //let next_function = 'play_stream'
-    //if ( state == 'MEDIA_ARCHIVE' ) {
-    let next_function = 'skip_select'
-    //}
+    let next_function = 'play_stream'
+    if ( state == 'MEDIA_ARCHIVE' ) {
+      next_function = 'skip_select'
+    }
     let button = '<button type="button" class="button" onclick="' + next_function + '(\'' + mediaId + '\',\'' + type + '\',\'' + state + '\',this.value)" value="' + start['value'] + '"><div><p class="title">' + start['title'] + '</p></div></button>'
     document.getElementById('modal-btn-group').innerHTML += button
   }
