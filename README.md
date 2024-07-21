@@ -31,7 +31,7 @@ Choose any one of these three methods to install and run:
 
 3. [Docker](https://hub.docker.com/r/tonywagner/plugin.video.mlb)
    * Download the [docker-compose.yml](https://raw.githubusercontent.com/tonywagner/plugin.video.mlb/master/docker-compose.yml) file, update the time zone in the file to your own, and create and start the container like '''docker compose up --detach'''  
-   * Alternately, you can run the command '''docker run -d --name plugin.video.mlb --env TZ="America/New_York" -p 5714:5714 --volume /absolute/path/to/your/data:/plugin.video.mlb/data tonywagner/plugin.video.mlb''' (substituting your own time zone, of course)  
+   * Alternately, you can run the command '''docker run -d --name plugin.video.mlb --env TZ="America/New_York" -p 5714:5714 --volume ./data:/plugin.video.mlb/data tonywagner/plugin.video.mlb''' (substituting your own time zone, of course)  
 
 # Usage
 
