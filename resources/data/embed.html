@@ -19,19 +19,22 @@
   let stream_url = 'stream.m3u8'
   if (searchParams.has('mediaId')) {
     stream_url += '?mediaId=' + searchParams.get('mediaId')
-    if (searchParams.has('start')) {
-      start = searchParams.get('start')
-      stream_url += '&start=' + start
-      if ( start == 'beginning' ) {
-        hls_config = {startPosition:0,liveSyncDuration:32400,liveMaxLatencyDuration:32410}
-      }
+  } else if (searchParams.has('teamId')) {
+    stream_url += '?teamId=' + searchParams.get('teamId')
+  }
+    
+  if (searchParams.has('start')) {
+    start = searchParams.get('start')
+    stream_url += '&start=' + start
+    if ( start == 'beginning' ) {
+      hls_config = {startPosition:0,liveSyncDuration:32400,liveMaxLatencyDuration:32410}
     }
-    if (searchParams.has('skip')) {
-      stream_url += '&skip=' + searchParams.get('skip')
-    }
-    if (searchParams.has('type') && (searchParams.get('type') == 'audio')) {
-      element = 'audio'
-    }
+  }
+  if (searchParams.has('skip')) {
+    stream_url += '&skip=' + searchParams.get('skip')
+  }
+  if (searchParams.has('type') && (searchParams.get('type') == 'audio')) {
+    element = 'audio'
   }
   
   var player = document.getElementById(element);

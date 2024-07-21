@@ -2,15 +2,24 @@
   {
     "title": "Today's Games",
     "link": "games.html",
-    "data": "games.json"
+    "data": "games.json",
+    "action": "games"
   },
   {
     "title": "Yesterday's Games",
     "link": "games.html?date=yesterday",
-    "data": "games.json?date=yesterday"
+    "data": "games.json?date=yesterday",
+    "action": "games"
   },
   {
     "title": "Go To Date",
-    "data": "games.json?date="
+    "data": "games.json?date=",
+    "action": "select"
+  },
+  {
+    "title": "Team Live Streams",
+    "link": "teams.html",
+    "data": "teams.json",
+    "action": "teams"
   }
 ]

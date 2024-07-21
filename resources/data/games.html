@@ -96,14 +96,13 @@ async function show_feeds(game_index) {
   document.getElementById('modal-btn-group').innerHTML = '';
   for(let i=0;i<feeds.length;i++) {
     let feed = feeds[i]
-    //let button = '<button type="button" class="button" onclick="start_select(this.value)" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"></img><div><p class="title">' + feed['title'] + '</p></div></button>'
     let button = '<button type="button" class="button"'
     if ( feed.hasOwnProperty('mediaId') ) {
       let next_function = 'skip_select'
       if ( feed['state'] == 'MEDIA_ON' ) {
         next_function = 'start_select'
       }
-      button += ' onclick="' + next_function + '(this.value,\'' + feed['type'] + '\',\'' + feed['state'] + '\')" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"'
+      button += ' onclick="' + next_function + '(this.value,\'' + feed['type'] + '\',\'' + feed['state'] + '\')" value="' + feed['mediaId'] + '"><img src="' + feed['type'] + '.svg"'
     }
     button += '></img><div><p class="title">' + feed['title'] + '</p></div></button>'
     document.getElementById('modal-btn-group').innerHTML += button

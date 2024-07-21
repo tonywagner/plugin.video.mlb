@@ -89,6 +89,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         			games_json = self.server.account.get_games()
         		self.respond(games_json)
         		
+        	elif parsed_url.path == (utils.LOCAL_WEBSERVER_BASE + 'teams.json'):
+        		teams_json = self.server.account.get_teams()
+        		self.respond(teams_json)
+        		
         	elif parsed_url.path == (utils.LOCAL_WEBSERVER_BASE + 'stream.m3u8') or parsed_url.path == (utils.LOCAL_WEBSERVER_BASE + "file"):
         		content, content_type, content_encoding = self.server.account.proxy_file(parsed_qs)
         		self.respond(content, content_type, content_encoding)

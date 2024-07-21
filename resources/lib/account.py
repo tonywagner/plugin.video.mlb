@@ -373,9 +373,16 @@ class Account:
 	def proxy_file(self, parsed_qs):
 		token = None
 		skip = None
-		if 'mediaId' in parsed_qs:
-			mediaId = parsed_qs['mediaId'][0]
-			url, token = self.get_playback(mediaId)
+		if 'mediaId' in parsed_qs or 'teamId' in parsed_qs:
+			if 'mediaId' in parsed_qs:
+				mediaId = parsed_qs['mediaId'][0]
+			else:
+				teamId = parsed_qs['teamId'][0]
+				mediaId = self.get_live_game(teamId)
+			if mediaId is not None:
+				url, token = self.get_playback(mediaId)
+			else:
+				return 'No live feed found', 'text/html', 'utf8'
 		elif 'url' in parsed_qs:
 			url = parsed_qs['url'][0]
 			if 'token' in parsed_qs:
@@ -442,21 +449,22 @@ class Account:
 	    				if feed['entitled'] == True and feed['mediaState'] != 'MEDIA_OFF' and ('blackedOut' not in feed or feed['blackedOut'] == False):
 	    					if 'mediaFeedType' in feed:
 	    						label = feed['mediaFeedType'].capitalize() + ' TV'
-	    						icon = 'video.svg'
 	    						type = 'video'
+	    						language = 'en'
 	    					else:
 	    						label = feed['type'].capitalize()
 	    						if feed['language'] == 'es':
 	    							label += ' Spanish'
 	    						label += ' Radio'
-	    						icon = 'audio.svg'
 	    						type = 'audio'
+	    						language = feed['language']
 	    					filtered_feed = {
 	    					  'title': feed['callLetters'] + ' (' + label + ')',
-	    					  'icon': icon,
 	    					  'mediaId': feed['mediaId'],
 	    					  'type': type,
-	    					  'state': feed['mediaState']
+	    					  'state': feed['mediaState'],
+	    					  'teamId': feed['mediaFeedSubType'],
+	    					  'language': language
 	    					}
 	    					filtered_feeds.append(filtered_feed)
 	    		if len(filtered_feeds) == 0:
@@ -480,7 +488,8 @@ class Account:
 				  'icon': 'image?away_teamId={0}&home_teamId={1}&width=72'.format(str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])),
 				  'thumb': 'image?away_teamId={0}&home_teamId={1}&width=750'.format(str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])),
 				  'fanart': 'image?venueId=%s' % str(game['gameData']['venueId']),
-				  'feeds' : filtered_feeds
+				  'feeds': filtered_feeds,
+				  'teamIds': [str(game['gameData']['home']['teamId']), str(game['gameData']['away']['teamId'])]
 				}
 	    		if game['gameData']['doubleHeader'] == 'Y':
 	    			filtered_game['title'] += ' Game ' + game['gameData']['gameNumber']
@@ -512,7 +521,7 @@ class Account:
 			}
 			return navigation
 		except Exception as e:
-			self.utils.log('failed to get navigation ' + str(e))        
+			self.utils.log('failed to get navigation ' + str(e))     
         
 	def get_games(self, date_string='today', days=0):
 		url = 'https://mastapi.mobile.mlbinfra.com/api/epg/v3/search?exp=MLB'
@@ -559,6 +568,11 @@ class Account:
 		url = 'icon.png'
 		if 'venueId' in parsed_qs:
 			url = 'http://cd-images.mlbstatic.com/stadium-backgrounds/color/light-theme/1920x1080/%s.png' % str(parsed_qs['venueId'][0])
+		elif 'teamId' in parsed_qs:
+			if 'format' in parsed_qs and parsed_qs['format'][0] == 'jpg':
+				url = 'https://www.mlbstatic.com/team-logos/share/%s.jpg' % str(parsed_qs['teamId'][0])
+			else:
+				url = 'https://www.mlbstatic.com/team-logos/%s.svg' % str(parsed_qs['teamId'][0])
 		elif 'away_teamId' in parsed_qs:
 			if int(parsed_qs['away_teamId'][0]) in range(108,158) and int(parsed_qs['home_teamId'][0]) in range(108,158):
 				if 'width' in parsed_qs:
@@ -568,3 +582,40 @@ class Account:
 				url = 'https://img.mlbstatic.com/mlb-photos/image/upload/ar_167:215,c_crop/fl_relative,l_team:{1}:fill:spot.png,w_1.0,h_1,x_0.5,y_0,fl_no_overflow,e_distort:100p:0:200p:0:200p:100p:0:100p/fl_relative,l_team:{0}:logo:spot:current,w_0.38,x_-0.25,y_-0.16/fl_relative,l_team:{1}:logo:spot:current,w_0.38,x_0.25,y_0.16/w_{2}/team/{0}/fill/spot.png'.format(str(parsed_qs['away_teamId'][0]), str(parsed_qs['home_teamId'][0]), str(width))
 				
 		return url
+        
+	def get_live_game(self, teamId):
+		data = self.get_games()
+		for game in json.loads(data)['games']:
+			if teamId in game['teamIds']:
+				for feed in game['feeds']:
+					if feed['state'] == 'MEDIA_ON' and feed['teamId'] == teamId and feed['language'] == 'en':
+						return feed['mediaId']
+        
+	def get_teams(self):
+		try:
+			rawdata = self.utils.get_cached_teams()
+			rawdata[0]
+			data = []
+			for row in rawdata:
+				data.append(dict(row))
+		except Exception as e:
+			try:
+				url = 'https://statsapi.mlb.com/api/v1/teams?sportIds=1,11,12,13,14'
+				#url = 'http://localhost:56239/mlb/teams.json'
+				headers = {
+				  'accept': '*/*',
+				  'accept-language': 'en-US,en;q=0.9',
+				  'content-type': 'application/json'
+				}
+				r = self.utils.http_get(url, {**self.common_headers, **headers})
+				for team in r.json()['teams']:
+					self.utils.save_cached_team(team['id'], team['sport']['id'], team['name'], team['sport']['name'], team['parentOrgName'] if 'parentOrgName' in team else None, team['parentOrgId'] if 'parentOrgId' in team else None)
+				rawdata = self.utils.get_cached_teams()
+				data = []
+				for row in rawdata:
+					data.append(dict(row))
+			except Exception as e:
+				self.utils.log('failed to get teams ' + str(e))
+				self.utils.log(r.text)
+				sys.exit(0)
+		return json.dumps(data)

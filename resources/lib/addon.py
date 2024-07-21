@@ -61,7 +61,7 @@ def select_date(link):
         formatted_date = utils.stringToDate(d, "%d/%m/%Y").strftime("%Y-%m-%d")
         link += formatted_date
         xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
-        url = get_url(action='listing', link=link)
+        url = get_url(action='games', link=link)
         xbmc.executebuiltin("Container.Update({0},replace)".format(url))
 
 
@@ -75,9 +75,7 @@ def list_menu():
         info_tag = list_item.getVideoInfoTag()
         info_tag.setMediaType('video')
         info_tag.setTitle(item['title'])
-        action = 'listing'
-        if 'link' not in item:
-            action = 'select'
+        action = item['action']
         url = get_url(action=action, link=item['data'])
         is_folder = True
         xbmcplugin.addDirectoryItem(HANDLE, url, list_item, is_folder)
@@ -95,6 +93,34 @@ def list_menu():
     xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
 
 
+def list_teams(link):
+    data = get_data(link)
+
+    xbmcplugin.setContent(HANDLE, 'videos')
+    for team in data:
+        title = team['name']
+        if team['parentOrgName']:
+            parent_info = team['level'] + ', ' + team['parentOrgName']
+            title += ' [COLOR=FFFFFF66](' + parent_info + ')[/COLOR]'
+        list_item = xbmcgui.ListItem(label=title)
+        image = LOCAL_WEBSERVER + 'image?teamId=' + str(team['teamId']) + '&format=jpg'
+        list_item.setArt({'icon': image, 'thumb': image, 'fanart': image})
+        info_tag = list_item.getVideoInfoTag()
+        info_tag.setTitle(team['name'])
+        info_tag.setMediaType('video')
+        if team['parentOrgName']:
+            info_tag.setPlot(parent_info)
+        list_item.setProperty('IsPlayable', 'true')
+        list_item.setMimeType('application/vnd.apple.mpegurl')
+        list_item.setContentLookup(False)
+        list_item.setProperty('inputstream', 'inputstream.adaptive')
+        url = get_url(action='play', link=LOCAL_WEBSERVER + 'stream.m3u8?teamId=' + str(team['teamId']))
+        is_folder = False
+        xbmcplugin.addDirectoryItem(HANDLE, url, list_item, is_folder)
+    
+    xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
+
+
 def list_games(link):
     data = get_data(link)
 
@@ -103,13 +129,13 @@ def list_games(link):
     
     list_item = xbmcgui.ListItem(label=data['navigation']['previous']['title'])
     list_item.setArt({'icon': LOCAL_WEBSERVER + 'icon.png', 'fanart': LOCAL_WEBSERVER + 'fanart.jpg'})
-    url = get_url(action='listing', link=link_base + data['navigation']['previous']['date'])
+    url = get_url(action='games', link=link_base + data['navigation']['previous']['date'])
     is_folder = True
     xbmcplugin.addDirectoryItem(HANDLE, url, list_item, is_folder)
 
     list_item = xbmcgui.ListItem(label='[B][COLOR=FFFFFF66]' + data['navigation']['current']['title'] + '[/COLOR][/B]')
     list_item.setArt({'icon': LOCAL_WEBSERVER + 'icon.png', 'fanart': LOCAL_WEBSERVER + 'fanart.jpg'})
-    url = get_url(action='listing', link=link_base + data['navigation']['current']['date'])
+    url = get_url(action='games', link=link_base + data['navigation']['current']['date'])
     is_folder = True
     xbmcplugin.addDirectoryItem(HANDLE, url, list_item, is_folder)
 
@@ -132,7 +158,7 @@ def list_games(link):
     # more navigation
     list_item = xbmcgui.ListItem(label=data['navigation']['next']['title'])
     list_item.setArt({'icon': LOCAL_WEBSERVER + 'icon.png', 'fanart': LOCAL_WEBSERVER + 'fanart.jpg'})
-    url = get_url(action='listing', link=link_base + data['navigation']['next']['date'])
+    url = get_url(action='games', link=link_base + data['navigation']['next']['date'])
     is_folder = True
     xbmcplugin.addDirectoryItem(HANDLE, url, list_item, is_folder)
     
@@ -179,6 +205,12 @@ def play_media(mediaId, type, start='none', skip='none'):
     xbmcplugin.setResolvedUrl(HANDLE, True, listitem=play_item)
 
 
+def play_video(path):
+    play_item = xbmcgui.ListItem(offscreen=True)
+    play_item.setPath(path)
+    xbmcplugin.setResolvedUrl(HANDLE, True, listitem=play_item)
+
+
 def router(paramstring):
     params = dict(parse_qsl(paramstring))
     if not params or params['action'] == 'menu':
@@ -189,11 +221,13 @@ def router(paramstring):
         logout(params['link'])
     elif params['action'] == 'select':
         select_date(params['link'])
-    elif params['action'] == 'listing':
+    elif params['action'] == 'games':
         list_games(params['link'])
+    elif params['action'] == 'teams':
+        list_teams(params['link'])
     elif params['action'] == 'feeds':
         list_feeds(params['feeds_string'])
     elif params['action'] == 'play':
-        play_video(params['video'])
+        play_video(params['link'])
     else:
         raise ValueError(f'Invalid paramstring: {paramstring}!')

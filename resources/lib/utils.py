@@ -137,6 +137,10 @@ def initialize_cache_db():
 		cursor.execute('DELETE FROM games')
 	except:
 		pass
+	try:
+		cursor.execute('CREATE TABLE teams (teamId INT PRIMARY KEY, sportId INT, name TEXT, level TEXT, parentOrgName TEXT, parentOrgId INT)')
+	except:
+		pass
 	DATABASE_CONNECTION.commit()
 	cursor.close()
 	
@@ -196,6 +200,19 @@ def save_cached_games(date, games, expiration):
 def get_cached_games(date):
 	cursor = DATABASE_CONNECTION.cursor()
 	cursor.execute('SELECT games FROM games WHERE date = ? AND expiration > datetime("now")', [date])
+	result = cursor.fetchall()
+	cursor.close()
+	return result
+
+def save_cached_team(teamId, sportId, name, level, parentOrgName, parentOrgId):
+	cursor = DATABASE_CONNECTION.cursor()
+	cursor.execute('REPLACE INTO teams VALUES(?, ?, ?, ?, ?, ?)', [teamId, sportId, name, level, parentOrgName, parentOrgId])
+	DATABASE_CONNECTION.commit()
+	cursor.close()
+
+def get_cached_teams():
+	cursor = DATABASE_CONNECTION.cursor()
+	cursor.execute('SELECT * FROM teams ORDER BY sportId, name')
 	result = cursor.fetchall()
 	cursor.close()
 	return result
@@ -278,5 +295,6 @@ VERIFY = True
 DATABASE_FILE = os.path.join(USER_DATA_DIRECTORY, 'cache.db')
 
 DATABASE_CONNECTION = sqlite3.connect(DATABASE_FILE, check_same_thread=False)
+DATABASE_CONNECTION.row_factory = sqlite3.Row
 
 initialize_cache_db()
