@@ -36,6 +36,30 @@ def get_setting(setting_name):
 	except:
 		return None
 
+def set_default_settings(default_settings_file):
+	try:
+		new_settings = ET.Element('settings')
+		new_settings.set('version', "2")
+		tree = ET.parse(default_settings_file)
+		root = tree.getroot()
+		for section in root:
+			for category in section:
+				for group in category:
+					for setting in group:
+						setting_name = setting.attrib['id']
+						for child in setting.findall('default'):
+							setting_value = child.text
+							if setting_value is None:
+								setting_value = ''
+							new_setting = ET.SubElement(new_settings, 'setting')
+							new_setting.set('id', setting_name)
+							new_setting.text = setting_value
+		new_settings_xml = ET.tostring(new_settings)
+		with open(SETTINGS_FILE, "wb") as f:
+			f.write(new_settings_xml)
+	except Exception as e:
+		log('error setting default settings ' + str(e))
+
 def set_setting(setting_name, setting_value):
 	tree = ET.parse(SETTINGS_FILE)
 	root = tree.getroot()
@@ -235,6 +259,9 @@ else:
 	VERSION = get_addon_attribute(addon_file, 'name') + ' version ' + get_addon_attribute(addon_file, 'version')
 
 SETTINGS_FILE = os.path.join(USER_DATA_DIRECTORY, 'settings.xml')
+
+if not os.path.exists(SETTINGS_FILE):
+	set_default_settings(os.path.join(APP_DIRECTORY, 'resources', 'settings.xml'))
 
 LOCAL_WEBSERVER_PORT = int(get_setting('local_webserver_port'))
 LOCAL_WEBSERVER_USERNAME = get_setting('local_webserver_username')

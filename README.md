@@ -19,9 +19,9 @@ Choose any one of these three methods to install and run:
 
 1. Kodi version 21 (Omega) or newer  
    * [Download and install Kodi](https://kodi.tv/download/) (see this [guide](https://troypoint.com/how-to-install-kodi-on-fire-tv/) for installing on a Fire Stick)  
-   * [Download the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip) and copy to your Kodi device (or just use code 278937 in the Downloader app on your Fire Stick)  
+   * Download the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip) and copy to your Kodi device (or just use code 278937 in the Downloader app on your Fire Stick)  
    * Launch Kodi and install the ZIP in the Addons section (Kodi will prompt you to allow installing addons from unknown sources)  
-   * __**Note:** Windows users must also install the Microsoft Visual C++ Redistributable version 14.40.33810.0 or later__  
+   * __**Note:** Windows users must also install the [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version) version 14.40.33810.0 or later__  
 
 2. Python (3.11 or newer) with the "requests" module installed  
    * [Download and install Python 3](https://www.python.org/downloads/) if you don't have it already  
@@ -29,9 +29,9 @@ Choose any one of these three methods to install and run:
    * [Download and unzip the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlb/releases/latest/download/plugin.video.mlb.zip)  
    * Run the service script like `python plugin.video.mlb/service.py` or `python3 plugin.video.mlb/service.py`
 
-3. Docker
-   * Download the [docker-compose.yml](https://raw.githubusercontent.com/tonywagner/plugin.video.mlb/master/docker-compose.yml) file, change the time zone in the file to your own, and create and start the container like '''docker compose up --detach'''  
-   * Alternately, you can run the command '''docker run -d --name plugin.video.mlb --env TZ="America/New_York" -p 5714:5714 tonywagner/plugin.video.mlb'''  
+3. [Docker](https://hub.docker.com/r/tonywagner/plugin.video.mlb)
+   * Download the [docker-compose.yml](https://raw.githubusercontent.com/tonywagner/plugin.video.mlb/master/docker-compose.yml) file, update the time zone in the file to your own, and create and start the container like '''docker compose up --detach'''  
+   * Alternately, you can run the command '''docker run -d --name plugin.video.mlb --env TZ="America/New_York" -p 5714:5714 --volume /absolute/path/to/your/data:/plugin.video.mlb/data tonywagner/plugin.video.mlb''' (substituting your own time zone, of course)  
 
 # Usage
 
