@@ -4,11 +4,7 @@
     "value": "none"
   },
   {
-    "title": "Skip breaks",
-    "value": "breaks"
-  },
-  {
-    "title": "Skip breaks and non-action pitches",
-    "value": "pitches"
+    "title": "Skip commercials",
+    "value": "commercials"
   }
 ]

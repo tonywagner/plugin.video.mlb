@@ -371,14 +371,17 @@ class Account:
 		return url, token
 			
 	def proxy_file(self, parsed_qs):
+		token = None
+		skip = None
 		if 'mediaId' in parsed_qs:
 			mediaId = parsed_qs['mediaId'][0]
 			url, token = self.get_playback(mediaId)
 		elif 'url' in parsed_qs:
 			url = parsed_qs['url'][0]
-			token = None
 			if 'token' in parsed_qs:
 				token = parsed_qs['token'][0]
+		if 'skip' in parsed_qs:
+			skip = parsed_qs['skip'][0]
 				
 		try:
 			headers = {
@@ -403,6 +406,8 @@ class Account:
 				proxied_url_prefix = 'file?'
 				if token is not None:
 					proxied_url_prefix += 'token=' + token + '&'
+				if skip is not None:
+					proxied_url_prefix += 'skip=' + skip + '&'
 				proxied_url_prefix += 'url='
 				content = re.sub(r"^(?!#|\Z).*", r""+proxied_url_prefix+r"\g<0>", content, flags=re.M)
 				# and the same for URI parameters
@@ -413,8 +418,11 @@ class Account:
 				# remove subtitles and extraneous lines for Kodi Inputstream Adaptive compatibility
 				content = re.sub(r"(?:#EXT-X-MEDIA:TYPE=SUBTITLES[\S]+\n)", r"", content, flags=re.M)
 				content = re.sub(r"(?:#EXT-X-I-FRAME-STREAM-INF:[\S]+\n)", r"", content, flags=re.M)
-				content = re.sub(r"^(?:#EXT-OATCLS-SCTE35:[\S]+\n)", r"", content, flags=re.M)
-				content = re.sub(r"^(?:#EXT-X-CUE-[\S]+\n)", r"", content, flags=re.M)
+				if skip == 'commercials':
+					content = re.sub(r"^(#EXT-OATCLS-SCTE35[\S\s]+?#EXT-X-CUE-IN)", r"#EXT-X-DISCONTINUITY", content, flags=re.M)
+				else:
+					content = re.sub(r"^(?:#EXT-OATCLS-SCTE35:[\S]+\n)", r"", content, flags=re.M)
+					content = re.sub(r"^(?:#EXT-X-CUE-[\S]+\n)", r"", content, flags=re.M)
 			else:
 				content = r.content
 				content_encoding = None

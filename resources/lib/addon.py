@@ -147,6 +147,7 @@ def list_feeds(feeds_string):
             if sys.argv[3] != 'resume:true' and feeds[feed_index]['type'] == 'video' and feeds[feed_index]['state'] == 'MEDIA_ON':
                 list_start(feeds[feed_index]['mediaId'], feeds[feed_index]['type'])
             else:
+                #list_skip(feeds[feed_index]['mediaId'], feeds[feed_index]['type'])
                 play_media(feeds[feed_index]['mediaId'], feeds[feed_index]['type'])
 
 
@@ -154,15 +155,15 @@ def list_start(mediaId, type):
     list = get_data('start.json')
     index = DIALOG.select(utils.LOCAL_STRING(30016), [item['title'] for item in list])
     if index > -1:
-        #list_skip(mediaId, list[index]['value'])
+        #list_skip(mediaId, type, list[index]['value'])
         play_media(mediaId, type, list[index]['value'])
 
 
-def list_skip(mediaId, start):
-    feeds = get_data('skip.json')
-    feed_index = DIALOG.select(utils.LOCAL_STRING(30017), [feed['title'] for feed in feeds])
-    if feed_index > -1:
-        play_media(mediaId, start, feeds[feed_index]['value'])
+def list_skip(mediaId, type, start='none'):
+    list = get_data('skip.json')
+    index = DIALOG.select(utils.LOCAL_STRING(30017), [item['title'] for item in list])
+    if index > -1:
+        play_media(mediaId, type, start, list[index]['value'])
 
 
 def play_media(mediaId, type, start='none', skip='none'):
