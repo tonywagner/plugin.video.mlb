@@ -447,7 +447,8 @@ class Account:
 	    					  'title': feed['callLetters'] + ' (' + label + ')',
 	    					  'icon': icon,
 	    					  'mediaId': feed['mediaId'],
-	    					  'type': type
+	    					  'type': type,
+	    					  'state': feed['mediaState']
 	    					}
 	    					filtered_feeds.append(filtered_feed)
 	    		if len(filtered_feeds) == 0:

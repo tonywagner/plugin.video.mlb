@@ -13,12 +13,18 @@
 <button onclick="history.back()">Go Back</button>
 <script>
   element = 'video'
+  hls_config = {}
+  start = 'beginning'
   let searchParams = new URLSearchParams(window.location.search)
   let stream_url = 'stream.m3u8'
   if (searchParams.has('mediaId')) {
     stream_url += '?mediaId=' + searchParams.get('mediaId')
     if (searchParams.has('start')) {
-      stream_url += '&start=' + searchParams.get('start')
+      start = searchParams.get('start')
+      stream_url += '&start=' + start
+      if ( start == 'beginning' ) {
+        hls_config = {startPosition:0,liveSyncDuration:32400,liveMaxLatencyDuration:32410}
+      }
     }
     if (searchParams.has('skip')) {
       stream_url += '&skip=' + searchParams.get('skip')
@@ -32,7 +38,7 @@
   player.style.display = 'block';
   var videoSrc = stream_url;
   if (Hls.isSupported()) {
-    var hls = new Hls();
+    var hls = new Hls(hls_config);
     hls.loadSource(videoSrc);
     hls.attachMedia(player);
     if ( element == 'video' ) {

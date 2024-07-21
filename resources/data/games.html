@@ -64,10 +64,9 @@ async function skip_select(mediaId, start) {
     document.getElementById('modal-btn-group').innerHTML += button
   }
   
-  document.getElementById("modalcontent").innerHTML = modal_text
   modal.style.display = "block"
 }
-async function start_select(mediaId) {
+async function start_select(mediaId, type) {
   let start_options
 
   const res = await fetch('/mlb/start.json')
@@ -79,11 +78,10 @@ async function start_select(mediaId) {
   document.getElementById('modal-btn-group').innerHTML = '';
   for(let i=0;i<start_options.length;i++) {
     let start = start_options[i]
-    let button = '<button type="button" class="button" onclick="skip_select(\'' + mediaId + '\',this.value)" value="' + start['value'] + '"><div><p class="title">' + start['title'] + '</p></div></button>'
+    let button = '<button type="button" class="button" onclick="play_stream(\'' + mediaId + '\',\'' + type + '\',this.value)" value="' + start['value'] + '"><div><p class="title">' + start['title'] + '</p></div></button>'
     document.getElementById('modal-btn-group').innerHTML += button
   }
   
-  document.getElementById("modalcontent").innerHTML = modal_text
   modal.style.display = "block"
 }
 async function show_feeds(game_index) {
@@ -97,7 +95,11 @@ async function show_feeds(game_index) {
     //let button = '<button type="button" class="button" onclick="start_select(this.value)" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"></img><div><p class="title">' + feed['title'] + '</p></div></button>'
     let button = '<button type="button" class="button"'
     if ( feed.hasOwnProperty('mediaId') ) {
-      button += ' onclick="play_stream(this.value,\'' + feed['type'] + '\')" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"'
+      let next_function = 'play_stream'
+      if ( feed['state'] == 'MEDIA_ON' ) {
+        next_function = 'start_select'
+      }
+      button += ' onclick="' + next_function + '(this.value,\'' + feed['type'] + '\')" value="' + feed['mediaId'] + '"><img src="' + feed['icon'] + '"'
     }
     button += '></img><div><p class="title">' + feed['title'] + '</p></div></button>'
     document.getElementById('modal-btn-group').innerHTML += button

@@ -143,15 +143,18 @@ def list_feeds(feeds_string):
     feed_index = DIALOG.select(utils.LOCAL_STRING(30015), [feed['title'] for feed in feeds])
     if feed_index > -1:
         if 'mediaId' in feeds[feed_index]:
-            #list_start(feeds[feed_index]['mediaId'])
-            play_media(feeds[feed_index]['mediaId'], 'none', 'none', feeds[feed_index]['icon'])
+            if sys.argv[3] != 'resume:true' and feeds[feed_index]['type'] == 'video' and feeds[feed_index]['state'] == 'MEDIA_ON':
+                list_start(feeds[feed_index]['mediaId'], feeds[feed_index]['type'])
+            else:
+                play_media(feeds[feed_index]['mediaId'], feeds[feed_index]['type'])
 
 
-def list_start(mediaId):
-    feeds = get_data('start.json')
-    feed_index = DIALOG.select(utils.LOCAL_STRING(30016), [feed['title'] for feed in feeds])
-    if feed_index > -1:
-        list_skip(mediaId, feeds[feed_index]['value'])
+def list_start(mediaId, type):
+    list = get_data('start.json')
+    index = DIALOG.select(utils.LOCAL_STRING(30016), [item['title'] for item in list])
+    if index > -1:
+        #list_skip(mediaId, list[index]['value'])
+        play_media(mediaId, type, list[index]['value'])
 
 
 def list_skip(mediaId, start):
@@ -161,13 +164,16 @@ def list_skip(mediaId, start):
         play_media(mediaId, start, feeds[feed_index]['value'])
 
 
-def play_media(mediaId, start, skip, icon):
+def play_media(mediaId, type, start='none', skip='none'):
     path = LOCAL_WEBSERVER + 'stream.m3u8?mediaId=' + mediaId + '&start=' + start + '&skip=' + skip
     play_item = xbmcgui.ListItem(path=path, offscreen=True)
     play_item.setMimeType('application/vnd.apple.mpegurl')
     play_item.setContentLookup(False)
-    if icon == 'video.svg':
+    if type == 'video':
         play_item.setProperty('inputstream', 'inputstream.adaptive')
+        if start == 'beginning':
+            play_item.setProperty('ResumeTime', '1')
+            play_item.setProperty('TotalTime', '1')
     xbmcplugin.setResolvedUrl(HANDLE, True, listitem=play_item)
 
 

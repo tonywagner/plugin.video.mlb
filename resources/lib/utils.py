@@ -133,7 +133,8 @@ def initialize_cache_db():
 	except:
 		pass
 	try:
-		cursor.execute('DELETE FROM games WHERE expiration < datetime("now")')
+		#cursor.execute('DELETE FROM games WHERE expiration < datetime("now")')
+		cursor.execute('DELETE FROM games')
 	except:
 		pass
 	DATABASE_CONNECTION.commit()
