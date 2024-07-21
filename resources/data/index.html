@@ -6,11 +6,11 @@
 <body>
 <div class="btn-group" id="btn-group"></div>
 <span id="status">
-<form action="/mlb/login" method="post">
+<form id="login_form" action="/mlb/login" method="post">
 MLB Account Email: <input type="text" name="mlb_account_email"/><br/>
 MLB Account Password: <input type="password" name="mlb_account_password"/><br/>
 <input type="hidden" name="redirect" value="redirect"/>
-<input type="submit" value="Log In">
+<input id="submit_button" type="submit" onclick="submit_login()" value="Log In"> <span id="login_message" class="message"></span>
 </form>
 </span>
 <span id="version"></span>
@@ -59,6 +59,12 @@ function removeDate(e) {
     date=datePicker.value
     window.location.href = '/mlb/games.html?date=' + date
   }
+}
+
+function submit_login(e) {
+  document.getElementById('submit_button').disabled = true
+  document.getElementById('login_message').innerHTML = 'Logging in, please wait...'
+  document.getElementById('login_form').submit()
 }
 
 var datePicker

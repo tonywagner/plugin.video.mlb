@@ -41,6 +41,7 @@ def login(link):
               'mlb_account_email': mlb_account_email,
               'mlb_account_password': mlb_account_password
             })
+            DIALOG.notification('MLB', 'Logging in, please wait...')
             r = utils.http_post(LOCAL_WEBSERVER + link, data=data)
         url = get_url(action='menu')
         xbmc.executebuiltin("Container.Update({0},replace)".format(url))

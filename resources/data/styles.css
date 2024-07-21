@@ -138,6 +138,10 @@ h2 {
   background-color: red;
 }
 
+.message {
+  color: rgb(255,255,71);
+}
+
 @media screen and (min-width: 700px) {
   h2 {
      font-size: 30px;

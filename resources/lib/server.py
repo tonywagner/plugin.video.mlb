@@ -120,10 +120,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             	post_data = urllib.parse.parse_qs(self.rfile.read(int(self.headers['Content-Length'])).decode('utf-8'))
             	self.server.account.logout()
             	self.server.account.login(post_data['mlb_account_email'][0], post_data['mlb_account_password'][0])
-            	if 'redirect' in post_data:
-            		self.redirect(utils.LOCAL_WEBSERVER_BASE + 'index.html')
-            	else:
-            		self.respond('logged in')
+            	self.respond('<script>window.location.href = "' + utils.LOCAL_WEBSERVER_BASE + '"</script>')
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     daemon_threads = True
