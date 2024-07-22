@@ -1,10 +1,10 @@
-FROM python:3.11-alpine
+FROM python:3.11.7-alpine
 
 RUN pip3 install requests && \
     rm -r /root/.cache
 
 # Create app directory
-WORKDIR /plugin.video.mlb
+WORKDIR /plugin.video.mlbserver
 
 # Bundle app source
 COPY . .

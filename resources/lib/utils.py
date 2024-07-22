@@ -3,6 +3,7 @@ import importlib.util
 import os
 from pathlib import Path
 import xml.etree.ElementTree as ET
+import platform
 
 import requests
 import pickle
@@ -13,7 +14,6 @@ import sqlite3
 import datetime
 from datetime import date, timezone
 import time
-#from zoneinfo import ZoneInfo
 
 
 # settings functions
@@ -264,7 +264,7 @@ if importlib.util.find_spec('xbmc'):
 	addon_handle.setSetting(id='initialize', value='')
 	LOCAL_STRING = addon.getLocalizedString
 	USER_DATA_DIRECTORY = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
-	VERSION = addon.getAddonInfo('name') + ' (' + addon_id + ' version ' + addon.getAddonInfo('version') + ' on Kodi version ' + xbmc.getInfoLabel('System.BuildVersion')
+	VERSION = addon.getAddonInfo('name') + ' (' + addon_id + ') ' + addon.getAddonInfo('version') + ' on Kodi version ' + xbmc.getInfoLabel('System.BuildVersion') + ', '
 else:
 	KODI = False
 	if os.environ.get('USER_DATA_DIRECTORY') is not None:
@@ -274,7 +274,9 @@ else:
 	Path(USER_DATA_DIRECTORY).mkdir(parents=True, exist_ok=True)
 
 	addon_file = os.path.join(APP_DIRECTORY, 'addon.xml')
-	VERSION = get_addon_attribute(addon_file, 'name') + ' version ' + get_addon_attribute(addon_file, 'version')
+	VERSION = get_addon_attribute(addon_file, 'id') + ' ' + get_addon_attribute(addon_file, 'version') + ' on '
+	
+VERSION += 'Python ' + platform.python_version()
 
 SETTINGS_FILE = os.path.join(USER_DATA_DIRECTORY, 'settings.xml')
 

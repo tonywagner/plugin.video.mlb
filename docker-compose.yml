@@ -1,10 +1,10 @@
 version: "3"
 services:
   plugin.video.mlb:
-    image: tonywagner/plugin.video.mlb
-    container_name: plugin.video.mlb
+    image: tonywagner/plugin.video.mlbserver
+    container_name: plugin.video.mlbserver
     environment:
-      - TZ=America/New York
+      - TZ=America/New_York
     ports:
       - 5714:5714
     volumes:
