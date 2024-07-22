@@ -82,7 +82,6 @@ class Account:
 	def get_interaction_handle(self):
 		try:
 			url = 'https://ids.mlb.com/oauth2/aus1m088yK07noBfh356/v1/interact'
-			#url = 'http://localhost:56239/mlb/interact.php'
 			headers = {
 			  'accept': 'application/json',
 			  'accept-language': 'en', 
@@ -113,7 +112,6 @@ class Account:
 		except:
 			try:
 				url = 'https://ids.mlb.com/idp/idx/introspect'
-				#url = 'http://localhost:56239/mlb/introspect.php'
 				headers = {
 				  'accept': 'application/ion+json; okta-version=1.0.0',
 				  'accept-language': 'en', 
@@ -151,7 +149,6 @@ class Account:
 	def get_identify(self):	
 		try:
 			url = 'https://ids.mlb.com/idp/idx/identify'
-			#url = 'http://localhost:56239/mlb/identify.php'
 			headers = {
 			  'accept': 'application/ion+json; okta-version=1.0.0',
 			  'accept-language': 'en', 
@@ -183,7 +180,6 @@ class Account:
 			identify_stateHandle = self.get_identify_stateHandle()
 			authenticators_password_id = self.get_authenticators_password_id()
 			url = 'https://ids.mlb.com/idp/idx/challenge'
-			#url = 'http://localhost:56239/mlb/challenge.php'
 			headers = {
 			  'accept': 'application/ion+json; okta-version=1.0.0',
 			  'accept-language': 'en', 
@@ -213,7 +209,6 @@ class Account:
 		try:
 			self.get_challenge()
 			url = 'https://ids.mlb.com/idp/idx/challenge/answer'
-			#url = 'http://localhost:56239/mlb/answer.php'
 			headers = {
 			  'accept': 'application/ion+json; okta-version=1.0.0',
 			  'accept-language': 'en', 
@@ -245,7 +240,6 @@ class Account:
 			try:
 				interaction_code = self.get_answer()
 				url = 'https://ids.mlb.com/oauth2/aus1m088yK07noBfh356/v1/token'
-				#url = 'http://localhost:56239/mlb/token.php'
 				headers = {
 				  'accept': 'application/json',
 				  'accept-language': 'en', 
@@ -287,7 +281,6 @@ class Account:
 	def get_session(self):
 		try:
 			url = 'https://media-gateway.mlb.com/graphql'
-			#url = 'http://localhost:56239/mlb/graphql.php'
 			headers = {
 			  'accept': 'application/json, text/plain, */*',
 			  'accept-encoding': 'gzip, deflate, br',
@@ -334,7 +327,6 @@ class Account:
 				deviceId = self.get_deviceId()
 				sessionId = self.get_sessionId()
 				url = 'https://media-gateway.mlb.com/graphql'
-				#url = 'http://localhost:56239/mlb/graphql.php'
 				headers = {
 				  'accept': 'application/json, text/plain, */*',
 				  'accept-encoding': 'gzip, deflate, br',
@@ -379,7 +371,10 @@ class Account:
 				mediaId = parsed_qs['mediaId'][0]
 			else:
 				teamId = parsed_qs['teamId'][0]
-				mediaId = self.get_live_game(teamId)
+				date = None
+				if 'date' in parsed_qs:
+					date = parsed_qs['date'][0]
+				mediaId = self.get_team_game(teamId, date)
 			if mediaId is not None:
 				url, token = self.get_playback(mediaId)
 			else:
@@ -543,11 +538,12 @@ class Account:
         
 	def get_games(self, date_string='today', days=0):
 		url = 'https://mastapi.mobile.mlbinfra.com/api/epg/v3/search?exp=MLB'
-		#url = 'http://localhost:56239/mlb/games.json?'
 		if days > 0:
 			d = self.utils.process_date_string('today')
 			url += '&startDate=' + d + '&endDate=' + str(self.utils.add_time(self.utils.stringToDate(d, '%Y-%m-%d'), days=days))
 		else:
+			if date_string is None:
+				date_string = 'today'
 			d = self.utils.process_date_string(date_string)
 			url += '&date=' + d
 		try:
@@ -601,12 +597,12 @@ class Account:
 				
 		return url
         
-	def get_live_game(self, teamId):
-		data = self.get_games()
+	def get_team_game(self, teamId, date=None):
+		data = self.get_games(date)
 		for game in json.loads(data)['games']:
 			if teamId in game['teamIds']:
 				for feed in game['feeds']:
-					if feed['state'] == 'MEDIA_ON' and feed['teamId'] == teamId and feed['language'] == 'en':
+					if feed['teamId'] == teamId and feed['language'] == 'en' and (feed['state'] == 'MEDIA_ON' or (date is not None and feed['state'] != 'MEDIA_OFF')):
 						return feed['mediaId']
         
 	def get_teams(self):
@@ -619,7 +615,6 @@ class Account:
 		except Exception as e:
 			try:
 				url = 'https://statsapi.mlb.com/api/v1/teams?sportIds=1,11,12,13,14'
-				#url = 'http://localhost:56239/mlb/teams.json'
 				headers = {
 				  'accept': '*/*',
 				  'accept-language': 'en-US,en;q=0.9',

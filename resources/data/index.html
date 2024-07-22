@@ -8,8 +8,8 @@
 <div class="btn-group" id="btn-group"></div>
 <span id="status">
 <form id="login_form" action="/mlb/login" method="post">
-MLB Account Email: <input type="text" name="mlb_account_email"/><br/>
-MLB Account Password: <input type="password" name="mlb_account_password"/><br/>
+MLB Account Email: <input type="text" name="mlb_account_email" autocomplete="username"/><br/>
+MLB Account Password: <input type="password" name="mlb_account_password" autocomplete="current-password"/><br/>
 <input type="hidden" name="redirect" value="redirect"/>
 <input id="submit_button" type="submit" onclick="submit_login()" value="Log In"> <span id="login_message" class="message"></span>
 </form>
@@ -39,7 +39,8 @@ async function update_page() {
     if ( item.hasOwnProperty('link') ) {
       button = '<a href="' + item['link'] + '"><button type="button" class="button"><div><p class="title">' + item['title'] + '</p></div></button></a>'
     } else {
-      button = '<button type="button" class="button"><div><p class="title">' + item['title'] + ' <input type="date" id="datePicker" value="' + new Date().toISOString().substring(0,10) + '"/></p></div></button>'
+      let d = new Date()
+      button = '<button type="button" class="button"><div><p class="title">' + item['title'] + ' <input type="date" id="datePicker" value="' + new Date(d.getTime() - (d.getTimezoneOffset() * 60 * 1000)).toISOString().substring(0,10) + '"/></p></div></button>'
     }
     document.getElementById('btn-group').innerHTML += button
   }

@@ -22,6 +22,9 @@
     stream_url += '?mediaId=' + searchParams.get('mediaId')
   } else if (searchParams.has('teamId')) {
     stream_url += '?teamId=' + searchParams.get('teamId')
+    if (searchParams.has('date')) {
+      stream_url += '&date=' + searchParams.get('date')
+    }
   }
     
   if (searchParams.has('start')) {
