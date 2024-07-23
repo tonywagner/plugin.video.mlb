@@ -8,12 +8,15 @@ import xbmcplugin
 from xbmcaddon import Addon
 from xbmcvfs import translatePath
 
-import resources.lib.utils as utils
-
 import datetime
 import time
 
 import json
+
+from resources.lib.utils import Utils
+
+utils = Utils()
+utils.addon_init()
 
 LOCAL_WEBSERVER = 'http://localhost:' + str(utils.LOCAL_WEBSERVER_PORT) + utils.LOCAL_WEBSERVER_BASE
 

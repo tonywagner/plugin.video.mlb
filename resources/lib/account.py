@@ -45,7 +45,9 @@ class Account:
 	def __init__(self, utils):
 		self.session = requests.session()
 		self.utils = utils
-		
+		if self.utils.get_setting('mlb_account_email') is not None and self.utils.get_setting('mlb_account_password') is not None:
+			access_token = self.get_token()
+			okta_id = self.get_okta_id()		
 		
 	def logout(self):
 		self.utils.save_cookies('')
