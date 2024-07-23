@@ -380,7 +380,7 @@ class Account:
 			else:
 				return 'No live feed found', 'text/html', 'utf8'
 		elif 'url' in parsed_qs:
-			url = parsed_qs['url'][0]
+			url = urllib.parse.unquote(parsed_qs['url'][0])
 			if 'token' in parsed_qs:
 				token = parsed_qs['token'][0]
 		if 'skip' in parsed_qs:
@@ -411,7 +411,7 @@ class Account:
 			# paths inside HLS manifests need to be adjusted
 			if content_type in self.hls_content_types:
 				# first set all relative URLs to their absolute paths
-				absolute_url_prefix = os.path.dirname(url)
+				absolute_url_prefix = urllib.parse.quote(os.path.dirname(url))
 				content = re.sub(r"^(?!#|http|\Z).*", r""+absolute_url_prefix+r"/\g<0>", r.text, flags=re.M)
 				# do the same for URI parameters
 				absolute_url_prefix = ',URI="' + absolute_url_prefix
@@ -435,6 +435,7 @@ class Account:
 				
 				# remove subtitles and extraneous lines for Kodi Inputstream Adaptive compatibility
 				content = re.sub(r"(?:#EXT-X-MEDIA:TYPE=SUBTITLES[\S]+\n)", r"", content, flags=re.M)
+				content = re.sub(r",SUBTITLES=\"subs\"", r"", content, flags=re.M)
 				content = re.sub(r"(?:#EXT-X-I-FRAME-STREAM-INF:[\S]+\n)", r"", content, flags=re.M)
 				# remove all segments between attempted commercial insertions, if requested
 				if skip == 'commercials':
@@ -731,4 +732,4 @@ class Account:
 
 		xml_output += '''
   </tv>'''
-		return xml_output
+		return xml_output.replace('&', '&amp;')

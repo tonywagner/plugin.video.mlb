@@ -29,6 +29,11 @@ class RequestHandler(BaseHTTPRequestHandler):
     def respond(self, content, content_type="text/html", content_encoding='utf8'):
         self.send_response(200)
         self.send_header("Content-Type", content_type)
+        try:
+        	self.send_header("Content-Length", str(len(content.encode())))
+        except:
+        	self.send_header("Content-Length", str(len(content)))
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.write(content, content_encoding)
 
