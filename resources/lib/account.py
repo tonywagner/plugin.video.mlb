@@ -500,15 +500,19 @@ class Account:
 	    		home_probable = game['gameData']['home']['probablePitcherLastName'] if game['gameData']['home']['probablePitcherLastName'] != '' else 'TBD'
 	    		if away_probable != 'TBD' or home_probable != 'TBD':
 	    			subtitle = away_probable + ' vs. ' + home_probable
+	    			
+	    		icon = self.utils.get_image_url(away_teamId=game['gameData']['away']['teamId'], home_teamId=game['gameData']['home']['teamId'], width=72)
+	    		thumb = self.utils.get_image_url(away_teamId=game['gameData']['away']['teamId'], home_teamId=game['gameData']['home']['teamId'], width=750)
+	    		fanart = self.utils.get_image_url(venueId=game['gameData']['venueId'])
 	    		filtered_game = {
 	    		  'gamePk': str(game['gamePk']),
 	    		  'start': game['gameData']['gameDate'],
 				  'time': self.utils.get_display_time(self.utils.stringToDate(game['gameData']['gameDate'], "%Y-%m-%dT%H:%M:%S%z", True)),
 				  'title': game['gameData']['away']['teamName'] + ' at ' + game['gameData']['home']['teamName'],
 				  'subtitle': subtitle,
-				  'icon': 'image?away_teamId={0}&home_teamId={1}&width=72'.format(str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])),
-				  'thumb': 'image?away_teamId={0}&home_teamId={1}&width=750'.format(str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])),
-				  'fanart': 'image?venueId=%s' % str(game['gameData']['venueId']),
+				  'icon': icon,
+				  'thumb': thumb,
+				  'fanart': fanart,
 				  'feeds': filtered_feeds,
 				  'teamIds': [str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])]
 				}
@@ -585,25 +589,6 @@ class Account:
 				self.utils.log(r.text)
 				sys.exit(0)
 		return data
-		
-	def get_image_url(self, parsed_qs):
-		url = 'icon.png'
-		if 'venueId' in parsed_qs:
-			url = 'http://cd-images.mlbstatic.com/stadium-backgrounds/color/light-theme/1920x1080/%s.png' % str(parsed_qs['venueId'][0])
-		elif 'teamId' in parsed_qs:
-			if 'format' in parsed_qs and parsed_qs['format'][0] == 'jpg':
-				url = 'https://www.mlbstatic.com/team-logos/share/%s.jpg' % str(parsed_qs['teamId'][0])
-			else:
-				url = 'https://www.mlbstatic.com/team-logos/%s.svg' % str(parsed_qs['teamId'][0])
-		elif 'away_teamId' in parsed_qs:
-			if int(parsed_qs['away_teamId'][0]) in range(108,159) and int(parsed_qs['home_teamId'][0]) in range(108,159):
-				if 'width' in parsed_qs:
-					width = parsed_qs['width'][0]
-				else:
-					width = 750
-				url = 'https://img.mlbstatic.com/mlb-photos/image/upload/ar_167:215,c_crop/fl_relative,l_team:{1}:fill:spot.png,w_1.0,h_1,x_0.5,y_0,fl_no_overflow,e_distort:100p:0:200p:0:200p:100p:0:100p/fl_relative,l_team:{0}:logo:spot:current,w_0.38,x_-0.25,y_-0.16/fl_relative,l_team:{1}:logo:spot:current,w_0.38,x_0.25,y_0.16/w_{2}/team/{0}/fill/spot.png'.format(str(parsed_qs['away_teamId'][0]), str(parsed_qs['home_teamId'][0]), str(width))
-				
-		return url
         
 	def get_team_game(self, teamId, date=None):
 		data = self.get_games(date)
@@ -622,7 +607,8 @@ class Account:
 				data.append(dict(row))
 		except Exception as e:
 			try:
-				url = 'https://statsapi.mlb.com/api/v1/teams?sportIds=1,11,12,13,14'
+				#url = 'https://statsapi.mlb.com/api/v1/teams?sportIds=1,11,12,13,14'
+				url = 'https://statsapi.mlb.com/api/v1/teams?sportIds=1'
 				headers = {
 				  'accept': '*/*',
 				  'accept-language': 'en-US,en;q=0.9',
@@ -643,7 +629,9 @@ class Account:
 						level = 'A+'
 					elif team['sport']['name'] == 'Single-A':
 						level = 'A'
-					self.utils.save_cached_team(team['id'], team['abbreviation'], team['sport']['id'], team['name'], team['teamName'], team['sport']['name'], level, league, team['venue']['id'], team['parentOrgName'] if 'parentOrgName' in team else None, team['parentOrgId'] if 'parentOrgId' in team else None)
+					logo = self.utils.get_image_url(teamId=team['id'])
+					logo_svg = self.utils.get_image_url(teamId=team['id'], format='svg')
+					self.utils.save_cached_team(team['id'], team['abbreviation'], team['sport']['id'], team['name'], team['teamName'], team['sport']['name'], level, league, team['venue']['id'], logo, logo_svg, team['parentOrgName'] if 'parentOrgName' in team else None, team['parentOrgId'] if 'parentOrgId' in team else None)
 				rawdata = self.utils.get_cached_teams()
 				data = []
 				for row in rawdata:
@@ -666,7 +654,7 @@ class Account:
 				id = self.get_channel_id(str(team['teamId']))
 				name = team['league'] + ' ' + team['name']
 				stream = url_base + 'stream.m3u8?teamId=' + str(team['teamId']) + '&resolution=best'
-				logo = url_base + 'image?teamId=' + str(team['teamId']) + '&format=jpg'
+				logo = self.utils.get_image_url(teamId=team['teamId'])
 				group = team['level']
 				if group != 'MLB':
 					group = 'MILB.' + group
@@ -730,7 +718,7 @@ class Account:
       <sport>Baseball</sport>
       <team lang="en">{away_team_name}</team>
       <team lang="en">{home_team_name}</team>
-    </programme>'''.format(channel_id=self.get_channel_id(teamId), start=start, stop=stop, title=title, subtitle=subtitle, description=description, icon=url_base + game['thumb'], teamId=teamId, original_air_date=original_air_date, gamePk=game['gamePk'], away_team_name=away_team_name, home_team_name=home_team_name)
+    </programme>'''.format(channel_id=self.get_channel_id(teamId), start=start, stop=stop, title=title, subtitle=subtitle, description=description, icon=game['thumb'], teamId=teamId, original_air_date=original_air_date, gamePk=game['gamePk'], away_team_name=away_team_name, home_team_name=home_team_name)
 
 		xml_output += '''
   </tv>'''

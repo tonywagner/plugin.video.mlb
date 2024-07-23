@@ -229,16 +229,21 @@ class Utils:
 			cursor.execute('DELETE FROM games')
 		except:
 			pass
+		# prune MILB teams from table for now
+		try:
+			cursor.execute('DELETE FROM teams WHERE sportId != 1')
+		except:
+			pass
 		# delete teams table if missing new columns
 		try:
-			cursor.execute('SELECT nickname FROM teams LIMIT 1')
+			cursor.execute('SELECT logo_svg FROM teams LIMIT 1')
 		except:
 			try:
 				cursor.execute('DROP TABLE teams')
 			except:
 				pass
 		try:
-			cursor.execute('CREATE TABLE teams (teamId INT PRIMARY KEY, abbreviation TEXT, sportId INT, name TEXT, nickname TEXT, level_name TEXT, level TEXT, league TEXT, venueId INT, parentOrgName TEXT, parentOrgId INT)')
+			cursor.execute('CREATE TABLE teams (teamId INT PRIMARY KEY, abbreviation TEXT, sportId INT, name TEXT, nickname TEXT, level_name TEXT, level TEXT, league TEXT, venueId INT, logo TEXT, logo_svg TEXT, parentOrgName TEXT, parentOrgId INT)')
 		except:
 			pass
 		self.DATABASE_CONNECTION.commit()
@@ -304,9 +309,9 @@ class Utils:
 		cursor.close()
 		return result
 
-	def save_cached_team(self, teamId, abbreviation, sportId, name, nickname, level_name, level, league, venueId, parentOrgName, parentOrgId):
+	def save_cached_team(self, teamId, abbreviation, sportId, name, nickname, level_name, level, league, venueId, logo, logo_svg, parentOrgName, parentOrgId):
 		cursor = self.DATABASE_CONNECTION.cursor()
-		cursor.execute('REPLACE INTO teams VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [teamId, abbreviation, sportId, name, nickname, level_name, level, league, venueId, parentOrgName, parentOrgId])
+		cursor.execute('REPLACE INTO teams VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [teamId, abbreviation, sportId, name, nickname, level_name, level, league, venueId, logo, logo_svg, parentOrgName, parentOrgId])
 		self.DATABASE_CONNECTION.commit()
 		cursor.close()
 
@@ -330,6 +335,21 @@ class Utils:
 		result = cursor.fetchall()
 		cursor.close()
 		return result
+		
+	def get_image_url(self, teamId=None, away_teamId=None, home_teamId=None, venueId=None, width=750, format=None):
+		url = 'icon.png'
+		if venueId:
+			url = 'http://cd-images.mlbstatic.com/stadium-backgrounds/color/light-theme/1920x1080/%s.png' % str(venueId)
+		elif teamId:
+			if format == 'svg':
+				url = 'https://www.mlbstatic.com/team-logos/%s.svg' % str(teamId)
+			else:
+				url = 'https://www.mlbstatic.com/team-logos/share/%s.jpg' % str(teamId)
+		elif away_teamId and home_teamId:
+			if away_teamId in range(108,159) and home_teamId in range(108,159):
+				url = 'https://img.mlbstatic.com/mlb-photos/image/upload/ar_167:215,c_crop/fl_relative,l_team:{1}:fill:spot.png,w_1.0,h_1,x_0.5,y_0,fl_no_overflow,e_distort:100p:0:200p:0:200p:100p:0:100p/fl_relative,l_team:{0}:logo:spot:current,w_0.38,x_-0.25,y_-0.16/fl_relative,l_team:{1}:logo:spot:current,w_0.38,x_0.25,y_0.16/w_{2}/team/{0}/fill/spot.png'.format(str(away_teamId), str(home_teamId), str(width))
+				
+		return url
 	
 	# date/time functions  
 	def get_utc_now(self):

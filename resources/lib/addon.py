@@ -106,8 +106,12 @@ def list_teams(link):
             parent_info = team['level'] + ', ' + team['parentOrgName']
             title += ' [COLOR=FFFFFF66](' + parent_info + ')[/COLOR]'
         list_item = xbmcgui.ListItem(label=title)
-        image = LOCAL_WEBSERVER + 'image?teamId=' + str(team['teamId']) + '&format=jpg'
-        list_item.setArt({'icon': image, 'thumb': image, 'fanart': image})
+        image = utils.get_image_url(teamId=team['teamId'])
+        if team['teamId'] in range (108,159):
+            fanart = utils.get_image_url(venueId=team['venueId'])
+        else:
+            fanart = image
+        list_item.setArt({'icon': image, 'thumb': image, 'fanart': fanart})
         info_tag = list_item.getVideoInfoTag()
         info_tag.setTitle(team['name'])
         info_tag.setMediaType('video')
@@ -147,7 +151,7 @@ def list_games(link):
     for game in games:
         title = game['time'] + ' ' + game['title'] + ' [COLOR=FF666666](' + game['subtitle'] + ')[/COLOR]'
         list_item = xbmcgui.ListItem(label=title)
-        list_item.setArt({'icon': LOCAL_WEBSERVER + game['icon'], 'thumb': LOCAL_WEBSERVER + game['thumb'], 'fanart': LOCAL_WEBSERVER + game['fanart']})
+        list_item.setArt({'icon': game['icon'], 'thumb': game['thumb'], 'fanart': game['fanart']})
         info_tag = list_item.getVideoInfoTag()
         info_tag.setTitle(game['title'])
         info_tag.setMediaType('video')

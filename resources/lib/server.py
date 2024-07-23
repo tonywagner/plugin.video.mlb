@@ -111,10 +111,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         		content, content_type, content_encoding = self.server.account.proxy_file(parsed_qs)
         		self.respond(content, content_type, content_encoding)
         		
-        	elif parsed_url.path == (self.server.utils.LOCAL_WEBSERVER_BASE + "image"):
-        		image_url = self.server.account.get_image_url(parsed_qs)
-        		self.redirect(image_url)
-        		
         	elif parsed_url.path == (self.server.utils.LOCAL_WEBSERVER_BASE + "logout"):
         		self.server.account.logout()
         		self.redirect(self.server.utils.LOCAL_WEBSERVER_BASE)
