@@ -141,8 +141,10 @@ def initialize_cache_db():
 	try:
 		cursor.execute('SELECT nickname FROM teams LIMIT 1')
 	except:
-		cursor.execute('DROP TABLE teams')
-		pass
+		try:
+			cursor.execute('DROP TABLE teams')
+		except:
+			pass
 	try:
 		cursor.execute('CREATE TABLE teams (teamId INT PRIMARY KEY, abbreviation TEXT, sportId INT, name TEXT, nickname TEXT, level_name TEXT, level TEXT, league TEXT, venueId INT, parentOrgName TEXT, parentOrgId INT)')
 	except:
