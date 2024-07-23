@@ -596,7 +596,7 @@ class Account:
 			else:
 				url = 'https://www.mlbstatic.com/team-logos/%s.svg' % str(parsed_qs['teamId'][0])
 		elif 'away_teamId' in parsed_qs:
-			if int(parsed_qs['away_teamId'][0]) in range(108,158) and int(parsed_qs['home_teamId'][0]) in range(108,158):
+			if int(parsed_qs['away_teamId'][0]) in range(108,159) and int(parsed_qs['home_teamId'][0]) in range(108,159):
 				if 'width' in parsed_qs:
 					width = parsed_qs['width'][0]
 				else:
@@ -666,7 +666,7 @@ class Account:
 				id = self.get_channel_id(str(team['teamId']))
 				name = team['league'] + ' ' + team['name']
 				stream = url_base + 'stream.m3u8?teamId=' + str(team['teamId']) + '&resolution=best'
-				logo = url_base + 'image?teamId=' + str(team['teamId'])
+				logo = url_base + 'image?teamId=' + str(team['teamId']) + '&format=jpg'
 				group = team['level']
 				if group != 'MLB':
 					group = 'MILB.' + group
