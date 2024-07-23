@@ -137,8 +137,14 @@ def initialize_cache_db():
 		cursor.execute('DELETE FROM games')
 	except:
 		pass
+	# delete teams table if missing new columns
 	try:
-		cursor.execute('CREATE TABLE teams (teamId INT PRIMARY KEY, sportId INT, name TEXT, level TEXT, parentOrgName TEXT, parentOrgId INT)')
+		cursor.execute('SELECT nickname FROM teams LIMIT 1')
+	except:
+		cursor.execute('DROP TABLE teams')
+		pass
+	try:
+		cursor.execute('CREATE TABLE teams (teamId INT PRIMARY KEY, abbreviation TEXT, sportId INT, name TEXT, nickname TEXT, level_name TEXT, level TEXT, league TEXT, venueId INT, parentOrgName TEXT, parentOrgId INT)')
 	except:
 		pass
 	DATABASE_CONNECTION.commit()
@@ -204,15 +210,29 @@ def get_cached_games(date):
 	cursor.close()
 	return result
 
-def save_cached_team(teamId, sportId, name, level, parentOrgName, parentOrgId):
+def save_cached_team(teamId, abbreviation, sportId, name, nickname, level_name, level, league, venueId, parentOrgName, parentOrgId):
 	cursor = DATABASE_CONNECTION.cursor()
-	cursor.execute('REPLACE INTO teams VALUES(?, ?, ?, ?, ?, ?)', [teamId, sportId, name, level, parentOrgName, parentOrgId])
+	cursor.execute('REPLACE INTO teams VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [teamId, abbreviation, sportId, name, nickname, level_name, level, league, venueId, parentOrgName, parentOrgId])
 	DATABASE_CONNECTION.commit()
 	cursor.close()
 
 def get_cached_teams():
 	cursor = DATABASE_CONNECTION.cursor()
 	cursor.execute('SELECT * FROM teams ORDER BY sportId, name')
+	result = cursor.fetchall()
+	cursor.close()
+	return result
+
+def get_cached_team_name(teamId):
+	cursor = DATABASE_CONNECTION.cursor()
+	cursor.execute('SELECT name FROM teams WHERE teamId = ? LIMIT 1', [teamId])
+	result = cursor.fetchall()
+	cursor.close()
+	return result
+
+def get_cached_team_nickname(teamId):
+	cursor = DATABASE_CONNECTION.cursor()
+	cursor.execute('SELECT nickname FROM teams WHERE teamId = ? LIMIT 1', [teamId])
 	result = cursor.fetchall()
 	cursor.close()
 	return result

@@ -452,14 +452,14 @@ class Account:
 			self.utils.log(r.text)
 			sys.exit(0)
 			
-	def filter_games(self, games):
+	def filter_games(self, games, filter_type=None):
 	    filtered_games = []
 	    for game in games['results']:
 	    	try:
 	    		filtered_feeds = []
 	    		for feed_key in self.feed_keys:
 	    			for feed in game[feed_key]:
-	    				if feed['entitled'] == True and feed['mediaState'] != 'MEDIA_OFF' and ('blackedOut' not in feed or feed['blackedOut'] == False):
+	    				if feed['entitled'] == True and ('blackedOut' not in feed or feed['blackedOut'] == False) and (feed['mediaState'] != 'MEDIA_OFF' or filter_type == 'guide'):
 	    					if 'mediaFeedType' in feed:
 	    						label = feed['mediaFeedType'].capitalize() + ' TV'
 	    						type = 'video'
@@ -492,20 +492,25 @@ class Account:
 	    			else:
 	    				filtered_feed = { 'title': 'You may need to log in' }
 	    				filtered_feeds.append(filtered_feed)
+	    		subtitle = ''
 	    		away_probable = game['gameData']['away']['probablePitcherLastName'] if game['gameData']['away']['probablePitcherLastName'] != '' else 'TBD'
 	    		home_probable = game['gameData']['home']['probablePitcherLastName'] if game['gameData']['home']['probablePitcherLastName'] != '' else 'TBD'
+	    		if away_probable != 'TBD' or home_probable != 'TBD':
+	    			subtitle = away_probable + ' vs. ' + home_probable
 	    		filtered_game = {
+	    		  'gamePk': str(game['gamePk']),
+	    		  'start': game['gameData']['gameDate'],
 				  'time': self.utils.get_display_time(self.utils.stringToDate(game['gameData']['gameDate'], "%Y-%m-%dT%H:%M:%S%z", True)),
 				  'title': game['gameData']['away']['teamName'] + ' at ' + game['gameData']['home']['teamName'],
-				  'subtitle': away_probable + ' vs. ' + home_probable,
+				  'subtitle': subtitle,
 				  'icon': 'image?away_teamId={0}&home_teamId={1}&width=72'.format(str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])),
 				  'thumb': 'image?away_teamId={0}&home_teamId={1}&width=750'.format(str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])),
 				  'fanart': 'image?venueId=%s' % str(game['gameData']['venueId']),
 				  'feeds': filtered_feeds,
-				  'teamIds': [str(game['gameData']['home']['teamId']), str(game['gameData']['away']['teamId'])]
+				  'teamIds': [str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])]
 				}
 	    		if game['gameData']['doubleHeader'] == 'Y':
-	    			filtered_game['title'] += ' Game ' + game['gameData']['gameNumber']
+	    			filtered_game['title'] += ' Game ' + str(game['gameData']['gameNumber'])
 	    		filtered_games.append(filtered_game)
 	    	except Exception as e:
 	    		self.utils.log('failed to filter game ' + str(e))
@@ -536,11 +541,11 @@ class Account:
 		except Exception as e:
 			self.utils.log('failed to get navigation ' + str(e))     
         
-	def get_games(self, date_string='today', days=0):
+	def get_games(self, date_string='today'):
 		url = 'https://mastapi.mobile.mlbinfra.com/api/epg/v3/search?exp=MLB'
-		if days > 0:
+		if date_string == 'guide':
 			d = self.utils.process_date_string('today')
-			url += '&startDate=' + d + '&endDate=' + str(self.utils.add_time(self.utils.stringToDate(d, '%Y-%m-%d'), days=days))
+			url += '&startDate=' + d + '&endDate=' + self.utils.dateToString(self.utils.add_time(self.utils.stringToDate(d, '%Y-%m-%d'), days=21), '%Y-%m-%d')
 		else:
 			if date_string is None:
 				date_string = 'today'
@@ -564,7 +569,7 @@ class Account:
 				r = self.utils.http_get(url, {**self.common_headers, **headers}, self.session)
 				data = {
 				  'navigation': self.get_navigation(d),
-				  'games': self.filter_games(r.json())
+				  'games': self.filter_games(r.json(), date_string)
 				}
 				data = json.dumps(data)
 				expires_in = 60
@@ -622,7 +627,20 @@ class Account:
 				}
 				r = self.utils.http_get(url, {**self.common_headers, **headers})
 				for team in r.json()['teams']:
-					self.utils.save_cached_team(team['id'], team['sport']['id'], team['name'], team['sport']['name'], team['parentOrgName'] if 'parentOrgName' in team else None, team['parentOrgId'] if 'parentOrgId' in team else None)
+					level = ''
+					league = 'MILB'
+					if team['sport']['name'] == 'Major League Baseball':
+						level = 'MLB'
+						league = 'MLB'
+					elif team['sport']['name'] == 'Triple-A':
+						level = 'AAA'
+					elif team['sport']['name'] == 'Double-A':
+						level = 'AA'
+					elif team['sport']['name'] == 'High-A':
+						level = 'A+'
+					elif team['sport']['name'] == 'Single-A':
+						level = 'A'
+					self.utils.save_cached_team(team['id'], team['abbreviation'], team['sport']['id'], team['name'], team['teamName'], team['sport']['name'], level, league, team['venue']['id'], team['parentOrgName'] if 'parentOrgName' in team else None, team['parentOrgId'] if 'parentOrgId' in team else None)
 				rawdata = self.utils.get_cached_teams()
 				data = []
 				for row in rawdata:
@@ -632,3 +650,85 @@ class Account:
 				self.utils.log(r.text)
 				sys.exit(0)
 		return json.dumps(data)
+	
+	def get_channel_id(self, teamId):
+		return 'plugin.video.mlbserver.' + teamId
+        
+	def get_channels(self, url_base):
+		channels = []
+		try:
+			teams = json.loads(self.get_teams())
+			channel_number = 1
+			for team in teams:
+				id = self.get_channel_id(str(team['teamId']))
+				name = team['league'] + ' ' + team['name']
+				stream = url_base + 'stream.m3u8?teamId=' + str(team['teamId']) + '&resolution=best'
+				logo = url_base + 'image?teamId=' + str(team['teamId'])
+				group = team['level']
+				if group != 'MLB':
+					group = 'MILB.' + group
+				channels.append({'id': id, 'name': name, 'stream': stream, 'logo': logo, 'group': group, 'number': str(channel_number)})
+				channel_number += 1
+		except Exception as e:
+			self.utils.log('failed to get channels ' + str(e))
+		return channels
+		
+	def get_channels_m3u(self, url_base):
+		channels = self.get_channels(url_base)
+		m3u_output = '#EXTM3U' + "\n"
+		for channel in channels:
+			m3u_output += '#EXTINF:-1 CUID="' + channel['id'] + '" channelID="' + channel['id'] + '" tvg-num="1.' + channel['number'] + '" tvg-chno="1.' + channel['number'] + '" tvg-id="' + channel['id'] + '" tvg-name="' + channel['name'] + '" tvg-logo="' + channel['logo'] + '" group-title="' + channel['group'] + '",' + channel['name'] + "\n" + channel['stream'] + "\n"
+		return m3u_output
+		
+	def get_channels_xml(self, url_base):
+		channels = self.get_channels(url_base)
+		xml_output = ''
+		for channel in channels:
+			xml_output += '''
+    <channel id="%s">
+      <display-name>%s</display-name>
+      <icon src="%s"></icon>
+    </channel>''' % (channel['id'], channel['name'], channel['logo'])
+		return xml_output
+        
+	def get_guide_xml(self, url_base):
+		xml_output = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tv SYSTEM "xmltv.dd">
+  <tv generator-info-name="plugin.video.mlbserver" source-info-name="plugin.video.mlbserver">'''
+		xml_output += self.get_channels_xml(url_base)
+		games = json.loads(self.get_games('guide'))['games']
+		for game in games:
+			start = self.utils.dateToString(self.utils.stringToDate(game['start'], "%Y-%m-%dT%H:%M:%S%z", True), "%Y%m%d%H%M%S %z")
+			stop = self.utils.dateToString(self.utils.add_time(self.utils.stringToDate(game['start'], "%Y-%m-%dT%H:%M:%S%z"), hours=3), "%Y%m%d%H%M%S %z")
+			original_air_date = self.utils.dateToString(self.utils.stringToDate(game['start'], "%Y-%m-%dT%H:%M:%S%z", True), "%Y-%m-%d %H:%M:%S")
+			away_team_name = self.utils.get_cached_team_name(game['teamIds'][0])[0][0]
+			home_team_name = self.utils.get_cached_team_name(game['teamIds'][1])[0][0]
+			for teamId in game['teamIds']:
+				title = 'MLB Baseball'
+				subtitle = away_team_name + ' at ' + home_team_name
+				description = ''
+				if len(game['subtitle']) > 0:
+					description = game['subtitle'] + ', '
+				description += self.utils.get_cached_team_nickname(teamId)[0][0] + ' broadcast (if available)'
+				xml_output += '''
+    <programme channel="{channel_id}" start="{start}" stop="{stop}">
+      <title lang="en">{title}</title>
+      <sub-title lang="en">{subtitle}</sub-title>
+      <desc lang="en">{description}</desc>
+      <category lang="en">Sports</category>
+      <category lang="en">Baseball</category>
+      <category lang="en">Sports event</category>
+      <icon src="{icon}"></icon>
+      <series-id system="team-id">{teamId}</series-id>
+      <episode-num system="original-air-date">{original_air_date}</episode-num>
+      <episode-num system="game-id">{gamePk}</episode-num>
+      <new/>
+      <live/>
+      <sport>Baseball</sport>
+      <team lang="en">{away_team_name}</team>
+      <team lang="en">{home_team_name}</team>
+    </programme>'''.format(channel_id=self.get_channel_id(teamId), start=start, stop=stop, title=title, subtitle=subtitle, description=description, icon=url_base + game['thumb'], teamId=teamId, original_air_date=original_air_date, gamePk=game['gamePk'], away_team_name=away_team_name, home_team_name=home_team_name)
+
+		xml_output += '''
+  </tv>'''
+		return xml_output

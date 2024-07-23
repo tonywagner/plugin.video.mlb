@@ -1,6 +1,6 @@
 version: "3"
 services:
-  plugin.video.mlb:
+  plugin.video.mlbserver:
     image: tonywagner/plugin.video.mlbserver
     container_name: plugin.video.mlbserver
     environment:

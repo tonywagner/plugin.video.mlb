@@ -93,6 +93,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         		teams_json = self.server.account.get_teams()
         		self.respond(teams_json)
         		
+        	elif parsed_url.path == (utils.LOCAL_WEBSERVER_BASE + 'channels.m3u'):
+        		content = self.server.account.get_channels_m3u(self.get_requested_host() + utils.LOCAL_WEBSERVER_BASE)
+        		self.respond(content)
+        		
+        	elif parsed_url.path == (utils.LOCAL_WEBSERVER_BASE + 'guide.xml'):
+        		content = self.server.account.get_guide_xml(self.get_requested_host() + utils.LOCAL_WEBSERVER_BASE)
+        		self.respond(content)
+        		
         	elif parsed_url.path == (utils.LOCAL_WEBSERVER_BASE + 'stream.m3u8') or parsed_url.path == (utils.LOCAL_WEBSERVER_BASE + "file"):
         		content, content_type, content_encoding = self.server.account.proxy_file(parsed_qs)
         		self.respond(content, content_type, content_encoding)
