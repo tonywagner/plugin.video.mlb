@@ -610,7 +610,7 @@ class Account:
 		for game in json.loads(data)['games']:
 			if teamId in game['teamIds']:
 				for feed in game['feeds']:
-					if feed['teamId'] == teamId and feed['language'] == 'en' and (feed['state'] == 'MEDIA_ON' or (date is not None and feed['state'] != 'MEDIA_OFF')):
+					if 'mediaId' in feed and 'teamId' in feed and 'language' in feed and 'state' in feed and feed['teamId'] == teamId and feed['language'] == 'en' and (feed['state'] == 'MEDIA_ON' or (date is not None and feed['state'] != 'MEDIA_OFF')):
 						return feed['mediaId']
         
 	def get_teams(self):
