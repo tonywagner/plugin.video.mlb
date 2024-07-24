@@ -7,21 +7,21 @@
 <body>
 <div class="btn-group" id="btn-group"></div>
 <span id="status">
-<form id="login_form" action="/mlb/login" method="post">
+<p><form id="login_form" action="/mlb/login" method="post">
 MLB Account Email: <input type="text" name="mlb_account_email" autocomplete="username"/><br/>
 MLB Account Password: <input type="password" name="mlb_account_password" autocomplete="current-password"/><br/>
 <input type="hidden" name="redirect" value="redirect"/>
 <input id="submit_button" type="submit" onclick="submit_login()" value="Log In"> <span id="login_message" class="message"></span>
-</form>
+</form></p>
 </span>
-<span id="version"></span>
+<p><span id="version"></span><p>
 <p><a href="/mlb/channels.m3u">channels.m3u</a> | <a href="/mlb/guide.xml">guide.xml</a></p>
 <script>
 async function update_page() {
   let status
   let res = await fetch('/mlb/status')
   status = await res.text()
-  if ( status ) {
+  if ( status != '' ) {
     document.getElementById('status').innerHTML = status
   }
   

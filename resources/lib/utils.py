@@ -204,6 +204,8 @@ class Utils:
 	def get_status(self):
 		if self.get_setting('mlb_account_email') is not None and self.get_setting('mlb_account_password') is not None:
 			return '<p>Logged In (<a href="logout">logout</a>)</p>'
+		else:
+			return ''
 
 	# database functions
 	def initialize_cache_db(self):

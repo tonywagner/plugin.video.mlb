@@ -433,7 +433,7 @@ class Account:
 				
 				# if resolution is specified, remove non-matching resolutions from manifest
 				if resolution is not None:
-					content = re.sub(r"^((?:#EXT-X-STREAM-INF:BANDWIDTH=)[\d]+(?:,AVERAGE-BANDWIDTH=)[\d]+(?:,CODECS=\"avc1.)[a-z0-9]+(?:,mp4a.40.2\",RESOLUTION=)[\d]+[x](?!" + resolution + ")[\S]+[\n][\S]+[\n])", r"", content, flags=re.M)
+					content = re.sub(r"^((?:#EXT-X-STREAM-INF:BANDWIDTH=)[\d]+(?:,AVERAGE-BANDWIDTH=)[\d]+(?:,CODECS=\"avc1.)[a-z0-9]+(?:,mp4a.40.2\",RESOLUTION=)[\d]+[x](?!" + resolution + r")[\S]+[\n][\S]+[\n])", r"", content, flags=re.M)
 				
 				# remove subtitles and extraneous lines for Kodi Inputstream Adaptive compatibility
 				content = re.sub(r"(?:#EXT-X-MEDIA:TYPE=SUBTITLES[\S]+\n)", r"", content, flags=re.M)
