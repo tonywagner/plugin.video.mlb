@@ -73,7 +73,7 @@ class Utils:
 		self.SETTINGS_FILE = os.path.join(self.USER_DATA_DIRECTORY, 'settings.xml')
 
 		if not os.path.exists(self.SETTINGS_FILE):
-			set_default_settings(os.path.join(self.APP_DIRECTORY, 'resources', 'settings.xml'))
+			self.set_default_settings(os.path.join(self.APP_DIRECTORY, 'resources', 'settings.xml'))
 
 		self.LOCAL_WEBSERVER_PORT = int(self.get_setting('local_webserver_port'))
 		self.LOCAL_WEBSERVER_USERNAME = self.get_setting('local_webserver_username')
