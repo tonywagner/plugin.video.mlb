@@ -93,7 +93,7 @@ class Utils:
 		#except:
 		#	pass
 
-		self.DATABASE_CONNECTION = sqlite3.connect(self.DATABASE_FILE + '?mode=rw', uri=True, check_same_thread=False)
+		self.DATABASE_CONNECTION = sqlite3.connect(self.DATABASE_FILE, check_same_thread=False)
 		self.DATABASE_CONNECTION.row_factory = sqlite3.Row
 
 		self.initialize_cache_db()
@@ -150,7 +150,7 @@ class Utils:
 			with open(self.SETTINGS_FILE, "wb") as f:
 				f.write(new_settings_xml)
 		except Exception as e:
-			log('error setting default settings ' + str(e))
+			self.log('error setting default settings ' + str(e))
 
 	def set_setting(self, setting_name, setting_value):
 		tree = ET.parse(self.SETTINGS_FILE)
