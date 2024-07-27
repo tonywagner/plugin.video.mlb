@@ -477,17 +477,17 @@ class Account:
           filtered_game = {
             'gamePk': str(game['gamePk']),
             'start': game['gameData']['gameDate'],
-          'time': self.utils.get_display_time(self.utils.stringToDate(game['gameData']['gameDate'], "%Y-%m-%dT%H:%M:%S%z", True)),
-          'title': game['gameData']['away']['teamName'] + ' at ' + game['gameData']['home']['teamName'],
-          'subtitle': subtitle,
-          'icon': icon,
-          'thumb': thumb,
-          'fanart': fanart,
-          'feeds': filtered_feeds,
-          'teamIds': [str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])],
-          'preGameHomeStart': pre_game_home_start,
-          'preGameAwayStart': pre_game_away_start,
-        }
+            'time': self.utils.get_display_time(self.utils.stringToDate(game['gameData']['gameDate'], "%Y-%m-%dT%H:%M:%S%z", True)),
+            'title': game['gameData']['away']['teamName'] + ' at ' + game['gameData']['home']['teamName'],
+            'subtitle': subtitle,
+            'icon': icon,
+            'thumb': thumb,
+            'fanart': fanart,
+            'feeds': filtered_feeds,
+            'teamIds': [str(game['gameData']['away']['teamId']), str(game['gameData']['home']['teamId'])],
+            'preGameHomeStart': pre_game_home_start,
+            'preGameAwayStart': pre_game_away_start,
+          }
           if game['gameData']['doubleHeader'] == 'Y':
             filtered_game['title'] += ' Game ' + str(game['gameData']['gameNumber'])
           filtered_games.append(filtered_game)
