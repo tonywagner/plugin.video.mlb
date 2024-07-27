@@ -675,7 +675,10 @@ class Account:
                   description = game['subtitle'] + ', '
               description += self.utils.get_cached_team_nickname(teamId)[0][0] + ' broadcast (if available)'
               
-              preGameStart = game['preGameHomeStart'] if teamId == home_team_id else game['preGameAwayStart']
+              if 'preGameHomeStart' in game and 'preGameAwayStart' in game:
+                preGameStart = game['preGameHomeStart'] if teamId == home_team_id else game['preGameAwayStart']
+              else:
+                preGameStart = ""
 
               if len(preGameStart) > 0:
                   pregame_stop = game_start
