@@ -32,7 +32,6 @@ class Account:
 	
 	code_verifier = None
 	identify_stateHandle = None
-	authenticators_password_id = None
 	okta_id = None
 	access_token = None
 	deviceId = None
@@ -55,7 +54,6 @@ class Account:
 		self.utils.reset_cache_db()
 		self.code_verifier = None
 		self.identify_stateHandle = None
-		self.authenticators_password_id = None
 		self.okta_id = None
 		self.access_token = None
 		self.deviceId = None
@@ -73,13 +71,6 @@ class Account:
 			return self.utils.add_time(self.utils.get_utc_now(), seconds=expiry)		
 		else:
 			return self.utils.stringToDate(expiry, '%Y-%m-%dT%H:%M:%S.%fZ')
-		
-	def get_code_verifier(self):
-		try:
-			self.code_verifier = self.utils.get_cached_session_data('code_verifier')[0][0]
-		except:
-			self.get_interaction_handle()
-		return self.code_verifier
 	
 	def get_interaction_handle(self):
 		try:
@@ -91,7 +82,6 @@ class Account:
 			  'x-okta-user-agent-extended': self.okta_user_agent_extended
 			}
 			self.code_verifier = secrets.token_hex(22)[:-1]
-			self.utils.save_cached_session_data('code_verifier', self.code_verifier)
 			data = urllib.parse.urlencode({
 			  'client_id': self.client_id,
 			  'scope': 'openid email',
@@ -110,43 +100,24 @@ class Account:
 			
 	def get_introspect_stateHandle(self):
 		try:
-			introspect_stateHandle = self.utils.get_cached_session_data('introspect_stateHandle')[0][0]
-		except:
-			try:
-				url = 'https://ids.mlb.com/idp/idx/introspect'
-				headers = {
-				  'accept': 'application/ion+json; okta-version=1.0.0',
-				  'accept-language': 'en', 
-				  'content-type': 'application/ion+json; okta-version=1.0.0', 
-				  'x-okta-user-agent-extended': self.okta_user_agent_extended
-				}
-				data = json.dumps({
-				  'interactionHandle': self.get_interaction_handle()
-				})
-				r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
-				response_json = r.json()
-				introspect_stateHandle = response_json['stateHandle']
-				introspect_expiresAt = self.get_expiresAt(response_json['expiresAt'])
-				self.utils.save_cached_session_data('introspect_stateHandle', introspect_stateHandle, introspect_expiresAt)
-			except Exception as e:
-				self.utils.log('failed to get introspect_stateHandle ' + str(e))
-				self.utils.log(r.text)
-				sys.exit(0)
-		return introspect_stateHandle
-		
-	def get_identify_stateHandle(self):
-		try:
-			self.identify_stateHandle = self.utils.get_cached_session_data('identify_stateHandle')[0][0]
-		except:
-			self.get_identify()
-		return self.identify_stateHandle
-		
-	def get_authenticators_password_id(self):
-		try:
-			self.authenticators_password_id = self.utils.get_cached_session_data('authenticators_password_id')[0][0]
-		except:
-			self.get_identify()
-		return self.authenticators_password_id
+			url = 'https://ids.mlb.com/idp/idx/introspect'
+			headers = {
+			  'accept': 'application/ion+json; okta-version=1.0.0',
+			  'accept-language': 'en', 
+			  'content-type': 'application/ion+json; okta-version=1.0.0', 
+			  'x-okta-user-agent-extended': self.okta_user_agent_extended
+			}
+			data = json.dumps({
+			  'interactionHandle': self.get_interaction_handle()
+			})
+			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
+			response_json = r.json()
+			introspect_stateHandle = response_json['stateHandle']
+			return introspect_stateHandle
+		except Exception as e:
+			self.utils.log('failed to get introspect_stateHandle ' + str(e))
+			self.utils.log(r.text)
+			sys.exit(0)
 			
 	def get_identify(self):	
 		try:
@@ -165,13 +136,11 @@ class Account:
 			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
 			response_json = r.json()
 			self.identify_stateHandle = response_json['stateHandle']
-			identify_expiresAt = self.get_expiresAt(response_json['expiresAt'])
-			self.utils.save_cached_session_data('identify_stateHandle', self.identify_stateHandle, identify_expiresAt)
 			for x in response_json['authenticators']['value']:
 				if x['type'] == 'password':
-					self.authenticators_password_id = x['id']
-					self.utils.save_cached_session_data('authenticators_password_id', self.authenticators_password_id)
+					authenticators_password_id = x['id']
 					break
+			return authenticators_password_id
 		except Exception as e:
 			self.utils.log('failed to get identify_stateHandle ' + str(e))
 			self.utils.log(r.text)
@@ -179,8 +148,7 @@ class Account:
 			
 	def get_challenge(self):
 		try:
-			identify_stateHandle = self.get_identify_stateHandle()
-			authenticators_password_id = self.get_authenticators_password_id()
+			authenticators_password_id = self.get_identify()
 			url = 'https://ids.mlb.com/idp/idx/challenge'
 			headers = {
 			  'accept': 'application/ion+json; okta-version=1.0.0',
@@ -192,7 +160,7 @@ class Account:
 			  'authenticator': {
 				'id': authenticators_password_id
 			  },
-			  'stateHandle': identify_stateHandle
+			  'stateHandle': self.identify_stateHandle
 			})
 			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
 		except Exception as e:
@@ -221,7 +189,7 @@ class Account:
 			  'credentials': {
 				'passcode': self.utils.get_setting('mlb_account_password')
 			  },
-			  'stateHandle': self.get_identify_stateHandle()
+			  'stateHandle': self.identify_stateHandle
 			})
 			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
 			response_json = r.json()
@@ -252,7 +220,7 @@ class Account:
 				  'client_id': self.client_id,
 				  'redirect_uri': 'https://www.mlb.com/login',
 				  'grant_type': 'interaction_code',
-				  'code_verifier': self.get_code_verifier(),
+				  'code_verifier': self.code_verifier,
 				  'interaction_code': interaction_code
 				})
 				r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)

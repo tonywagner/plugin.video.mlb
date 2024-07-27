@@ -2,12 +2,16 @@
 ![License](https://img.shields.io/badge/license-GPL%20(%3E%3D%202)-orange)
 [![Contributors](https://img.shields.io/github/contributors/tonywagner/plugin.video.mlbserver.svg)](https://github.com/tonywagner/plugin.video.mlbserver/graphs/contributors)
 
-# Features
+# Notes
 
-* Watch in Kodi and/or a web browser
-* Watch recaps and highlights
-* Watch free games with an account
+This software is in a PRE-ALPHA state. Intended as an eventual replacement for [mlbserver](https://github.com/tonywagner/mlbserver)
+
+# Current Features
+
+* Watch in a web browser and optionally Kodi
+* Watch free games with a free account
 * Watch all non-blackout games with a valid subscription
+* Generate M3U/XML to watch streams in separate DVR software
 
 # Disclaimer
 
@@ -29,17 +33,12 @@ Choose any one of these three methods to install and run:
 
 3. Python (3.11.7 or newer) with the "requests" module installed  
    * [Download and install Python 3](https://www.python.org/downloads/) if you don't have it already  
-   * Install the Python "requests" module like `pip install requests` or `pip3 install requests`
+   * Install the Python "requests" module like `pip3 install requests`
    * [Download and unzip the [latest release ZIP file](https://github.com/tonywagner/plugin.video.mlbserver/releases/latest/download/plugin.video.mlbserver.zip)  
-   * Run the service script like `python plugin.video.mlbserver/service.py` or `python3 plugin.video.mlbserver/service.py`
+   * Run the service script like `python3 plugin.video.mlbserver/service.py`
 
 # Usage
 
 Once installed, open any web browser on your network and navigate to http://IP-ADDRESS:5714 (using the IP address of the device running Kodi or the Python script).
 
 If you installed within Kodi, you can access it within the Addons section of Kodi too.
-
-# Notes
-
-Intended as a replacement for [mlbserver](https://github.com/tonywagner/mlbserver)
-
