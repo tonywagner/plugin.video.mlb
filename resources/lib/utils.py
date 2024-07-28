@@ -52,9 +52,8 @@ class Utils:
 
 			addon = xbmcaddon.Addon()
 			addon_id = addon.getAddonInfo('id')
-			#addon_handle = xbmcaddon.Addon(id=addon_id)
-			#addon_handle.setSetting(id='initialize', value='')
-			#self.LOCAL_STRING = addon.getLocalizedString
+			addon_handle = xbmcaddon.Addon(id=addon_id)
+			addon_handle.setSetting(id='initialize', value='')
 			self.USER_DATA_DIRECTORY = xbmcvfs.translatePath(addon.getAddonInfo('profile'))
 			self.VERSION = addon.getAddonInfo('name') + ' (' + addon_id + ') ' + addon.getAddonInfo('version') + ' on Kodi version ' + xbmc.getInfoLabel('System.BuildVersion') + ', '
 		else:
