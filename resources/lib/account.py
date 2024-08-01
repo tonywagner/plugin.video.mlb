@@ -10,6 +10,7 @@ import sys
 
 class Account:
 	session = None
+	user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
 	common_headers = {
 	  'cache-control': 'no-cache', 
 	  'origin': 'https://www.mlb.com', 
@@ -22,20 +23,19 @@ class Account:
 	  'sec-fetch-dest': 'empty', 
 	  'sec-fetch-mode': 'cors', 
 	  'sec-fetch-site': 'same-site', 
-	  'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+	  'user-agent': user_agent
 	}
 	verify=True
 	okta_user_agent_extended = 'okta-auth-js/7.0.2 okta-signin-widget-7.14.0'
-	client_id = '0oap7wa857jcvPlZ5355'
+	client_id = '0oa3e1nutA1HLzAKG356'
 	
 	hls_content_types = ['application/vnd.apple.mpegurl', 'application/x-mpegURL', 'audio/mpegurl']
 	
-	code_verifier = None
-	identify_stateHandle = None
 	okta_id = None
 	access_token = None
 	deviceId = None
 	sessionId = None
+	entitlements = []
 	
 	feed_keys = ['videoFeeds', 'audioFeeds']
 	
@@ -45,19 +45,18 @@ class Account:
 		self.session = requests.session()
 		self.utils = utils
 		if self.utils.get_setting('mlb_account_email') is not None and self.utils.get_setting('mlb_account_password') is not None:
-			access_token = self.get_token()
-			okta_id = self.get_okta_id()		
+			self.get_token()
+			self.get_okta_id()
 		
 	def logout(self):
 		self.utils.save_cookies('')
 		self.session = requests.session()
 		self.utils.reset_cache_db()
-		self.code_verifier = None
-		self.identify_stateHandle = None
 		self.okta_id = None
 		self.access_token = None
 		self.deviceId = None
 		self.sessionId = None
+		self.entitlements = []
 		self.utils.set_setting('mlb_account_email', '')
 		self.utils.set_setting('mlb_account_password', '')
 
@@ -72,135 +71,24 @@ class Account:
 		else:
 			return self.utils.stringToDate(expiry, '%Y-%m-%dT%H:%M:%S.%fZ')
 	
-	def get_interaction_handle(self):
-		try:
-			url = 'https://ids.mlb.com/oauth2/aus1m088yK07noBfh356/v1/interact'
-			headers = {
-			  'accept': 'application/json',
-			  'accept-language': 'en', 
-			  'content-type': 'application/x-www-form-urlencoded', 
-			  'x-okta-user-agent-extended': self.okta_user_agent_extended
-			}
-			self.code_verifier = secrets.token_hex(22)[:-1]
-			data = urllib.parse.urlencode({
-			  'client_id': self.client_id,
-			  'scope': 'openid email',
-			  'redirect_uri': 'https://www.mlb.com/login',
-			  'code_challenge': base64.urlsafe_b64encode(hashlib.sha256(self.code_verifier.encode('utf-8')).digest()).decode('utf-8').replace('=', ''),
-			  'code_challenge_method': 'S256',
-			  'state': secrets.token_urlsafe(),
-			  'nonce': secrets.token_urlsafe()
-			})
-			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
-			return r.json()['interaction_handle']
-		except Exception as e:
-			self.utils.log('failed to get interaction_handle ' + str(e))
-			self.utils.log(r.text)
-			sys.exit(0)
-			
-	def get_introspect_stateHandle(self):
-		try:
-			url = 'https://ids.mlb.com/idp/idx/introspect'
-			headers = {
-			  'accept': 'application/ion+json; okta-version=1.0.0',
-			  'accept-language': 'en', 
-			  'content-type': 'application/ion+json; okta-version=1.0.0', 
-			  'x-okta-user-agent-extended': self.okta_user_agent_extended
-			}
-			data = json.dumps({
-			  'interactionHandle': self.get_interaction_handle()
-			})
-			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
-			response_json = r.json()
-			introspect_stateHandle = response_json['stateHandle']
-			return introspect_stateHandle
-		except Exception as e:
-			self.utils.log('failed to get introspect_stateHandle ' + str(e))
-			self.utils.log(r.text)
-			sys.exit(0)
-			
-	def get_identify(self):	
-		try:
-			url = 'https://ids.mlb.com/idp/idx/identify'
-			headers = {
-			  'accept': 'application/ion+json; okta-version=1.0.0',
-			  'accept-language': 'en', 
-			  'content-type': 'application/json',  
-			  'x-okta-user-agent-extended': self.okta_user_agent_extended
-			}
-			data = json.dumps({
-			  'identifier': self.utils.get_setting('mlb_account_email'),
-			  'rememberMe': True,
-			  'stateHandle': self.get_introspect_stateHandle()
-			})
-			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
-			response_json = r.json()
-			self.identify_stateHandle = response_json['stateHandle']
-			for x in response_json['authenticators']['value']:
-				if x['type'] == 'password':
-					authenticators_password_id = x['id']
-					break
-			return authenticators_password_id
-		except Exception as e:
-			self.utils.log('failed to get identify_stateHandle ' + str(e))
-			self.utils.log(r.text)
-			sys.exit(0)
-			
-	def get_challenge(self):
-		try:
-			authenticators_password_id = self.get_identify()
-			url = 'https://ids.mlb.com/idp/idx/challenge'
-			headers = {
-			  'accept': 'application/ion+json; okta-version=1.0.0',
-			  'accept-language': 'en', 
-			  'content-type': 'application/json', 
-			  'x-okta-user-agent-extended': self.okta_user_agent_extended
-			}
-			data = json.dumps({
-			  'authenticator': {
-				'id': authenticators_password_id
-			  },
-			  'stateHandle': self.identify_stateHandle
-			})
-			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
-		except Exception as e:
-			self.utils.log('failed to get challenge ' + str(e))
-			self.utils.log(r.text)
-			sys.exit(0)
-	
 	def get_okta_id(self):
 		try:
-			self.okta_id = self.utils.get_cached_session_data('okta_id')[0][0]
-		except:
-			self.get_answer()
-		return self.okta_id
-	
-	def get_answer(self):
-		try:
-			self.get_challenge()
-			url = 'https://ids.mlb.com/idp/idx/challenge/answer'
-			headers = {
-			  'accept': 'application/ion+json; okta-version=1.0.0',
-			  'accept-language': 'en', 
-			  'content-type': 'application/json', 
-			  'x-okta-user-agent-extended': self.okta_user_agent_extended
-			}
-			data = json.dumps({
-			  'credentials': {
-				'passcode': self.utils.get_setting('mlb_account_password')
-			  },
-			  'stateHandle': self.identify_stateHandle
-			})
-			r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
-			response_json = r.json()
-			self.okta_id = response_json['user']['value']['id']
-			self.utils.save_cached_session_data('okta_id', self.okta_id)
-			for x in response_json['successWithInteractionCode']['value']:
-				if x['name'] == 'interaction_code':
-					return x['value']
+			try:
+				self.okta_id = self.utils.get_cached_session_data('okta_id')[0][0]
+			except:
+				# get a sample stream token from which to extract the base64-encoded okta_id
+				token = None
+				try:
+					token = self.utils.get_any_cached_stream_token()[0][0]
+				except:
+					url, token = self.get_playback('b7f0fff7-266f-4171-aa2d-af7988dc9302')
+				if token:
+					encoded_okta_id = token.split('_')[1]
+					self.okta_id = base64.b64decode(encoded_okta_id.encode('ascii') + b'==').decode('ascii')
+					self.utils.save_cached_session_data('okta_id', self.okta_id)
+			return self.okta_id
 		except Exception as e:
-			self.utils.log('failed to get answer ' + str(e))
-			self.utils.log(r.text)
+			self.utils.log('failed to get okta_id ' + str(e))
 			sys.exit(0)
 			
 	def get_token(self):	
@@ -208,22 +96,19 @@ class Account:
 			self.access_token = self.utils.get_cached_session_data('access_token')[0][0]
 		except:
 			try:
-				interaction_code = self.get_answer()
 				url = 'https://ids.mlb.com/oauth2/aus1m088yK07noBfh356/v1/token'
 				headers = {
-				  'accept': 'application/json',
-				  'accept-language': 'en', 
-				  'content-type': 'application/x-www-form-urlencoded', 
-				  'x-okta-user-agent-extended': self.okta_user_agent_extended
+				  'user-agent': self.user_agent,
+				  'content-type': 'application/x-www-form-urlencoded'
 				}
 				data = urllib.parse.urlencode({
-				  'client_id': self.client_id,
-				  'redirect_uri': 'https://www.mlb.com/login',
-				  'grant_type': 'interaction_code',
-				  'code_verifier': self.code_verifier,
-				  'interaction_code': interaction_code
+				  'username': self.utils.get_setting('mlb_account_email'),
+				  'password': self.utils.get_setting('mlb_account_password'),
+				  'grant_type': 'password',
+				  'scope': 'openid offline_access',
+				  'client_id': self.client_id
 				})
-				r = self.utils.http_post(url, {**self.common_headers, **headers}, data, self.session)
+				r = self.utils.http_post(url, headers, data, self.session)
 				response_json = r.json()
 				self.access_token = response_json['access_token']
 				access_token_expiresAt = self.get_expiresAt(int(response_json['expires_in']))
@@ -247,6 +132,13 @@ class Account:
 		except:
 			self.get_session()
 		return self.sessionId
+		
+	def get_entitlements(self):
+		try:
+			self.entitlements = json.loads(self.utils.get_cached_session_data('entitlements')[0][0])
+		except:
+			self.get_session()
+		return self.entitlements
 			
 	def get_session(self):
 		try:
@@ -284,6 +176,10 @@ class Account:
 			self.utils.save_cached_session_data('deviceId', self.deviceId)
 			self.sessionId = response_json['data']['initSession']['sessionId']
 			self.utils.save_cached_session_data('sessionId', self.sessionId)
+			self.entitlements = []
+			for entitlement in response_json['data']['initSession']['entitlements']:
+				self.entitlements.append(entitlement['code'])
+			self.utils.save_cached_session_data('entitlements', json.dumps(self.entitlements))
 		except Exception as e:
 			self.utils.log('failed to get deviceId and sessionId ' + str(e))
 			self.utils.log(r.text)
@@ -291,7 +187,7 @@ class Account:
 			
 	def get_playback(self, mediaId):
 		try:
-			url, token = self.utils.get_cached_stream(mediaId)[0][0]
+			url, token = self.utils.get_cached_stream(mediaId)[0]
 		except:
 			try:
 				deviceId = self.get_deviceId()

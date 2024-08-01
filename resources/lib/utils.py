@@ -196,6 +196,7 @@ class Utils:
 
 	def log(self, message):			
 		if importlib.util.find_spec('xbmc'):
+			import xbmc
 			xbmc.log(message)
 		else:
 			print(message)
@@ -220,6 +221,14 @@ class Utils:
 		try:
 			cursor.execute('CREATE TABLE session (id TEXT PRIMARY KEY, value TEXT, expiration TIMESTAMP)')
 		except:
+			# flush session table if missing entitlements, added in v2024.8.1
+			try:
+				cursor.execute('SELECT value FROM session WHERE id = "entitlements" LIMIT 1')
+			except:
+				try:
+					cursor.execute('DELETE FROM session')
+				except:
+					pass
 			pass
 		try:
 			cursor.execute('CREATE TABLE games (date TEXT PRIMARY KEY, games TEXT, expiration TIMESTAMP)')
@@ -276,6 +285,13 @@ class Utils:
 	def get_cached_stream(self, mediaId):
 		cursor = self.DATABASE_CONNECTION.cursor()
 		cursor.execute('SELECT url, token FROM streams WHERE mediaId = ? AND expiration > datetime("now")', [mediaId])
+		result = cursor.fetchall()
+		cursor.close()
+		return result
+
+	def get_any_cached_stream_token(self):
+		cursor = self.DATABASE_CONNECTION.cursor()
+		cursor.execute('SELECT token FROM streams LIMIT 1')
 		result = cursor.fetchall()
 		cursor.close()
 		return result
