@@ -10,4 +10,4 @@ WORKDIR /plugin.video.mlbserver
 COPY . .
 
 EXPOSE 5714
-CMD [ "python3", "service.py" ]
+CMD [ "python3", "-u", "service.py" ]

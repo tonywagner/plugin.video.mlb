@@ -83,6 +83,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         		self.respond(content, content_type=content_type, content_encoding=None)
         		
         	elif parsed_url.path == (self.server.utils.LOCAL_WEBSERVER_BASE + 'version'):
+        		self.server.utils.log(self.server.utils.VERSION)
         		self.respond(self.server.utils.VERSION)
         		
         	elif parsed_url.path == (self.server.utils.LOCAL_WEBSERVER_BASE + 'status'):

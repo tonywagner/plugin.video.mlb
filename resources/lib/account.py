@@ -76,11 +76,13 @@ class Account:
 			try:
 				self.okta_id = self.utils.get_cached_session_data('okta_id')[0][0]
 			except:
-				# get a sample stream token from which to extract the base64-encoded okta_id
+				# get a sample playback token from which to extract the base64-encoded okta_id
 				token = None
 				try:
+					# use any currently cached playback token
 					token = self.utils.get_any_cached_stream_token()[0][0]
 				except:
+					# otherwise, get a new playback token for a past free game
 					url, token = self.get_playback('b7f0fff7-266f-4171-aa2d-af7988dc9302')
 				if token:
 					encoded_okta_id = token.split('_')[1]

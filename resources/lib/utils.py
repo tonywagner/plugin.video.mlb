@@ -68,6 +68,7 @@ class Utils:
 			self.VERSION = self.get_addon_attribute(addon_file, 'id') + ' ' + self.get_addon_attribute(addon_file, 'version') + ' on '
 	
 		self.VERSION += 'Python ' + platform.python_version()
+		self.log(self.VERSION)
 
 		self.SETTINGS_FILE = os.path.join(self.USER_DATA_DIRECTORY, 'settings.xml')
 
@@ -197,9 +198,9 @@ class Utils:
 	def log(self, message):			
 		if importlib.util.find_spec('xbmc'):
 			import xbmc
-			xbmc.log(message)
+			xbmc.log(str(message))
 		else:
-			print(message)
+			print(str(self.get_utc_now().astimezone()) + ' ' + str(message))
 
 	def get_status(self):
 		if self.get_setting('mlb_account_email') is not None and self.get_setting('mlb_account_password') is not None:
