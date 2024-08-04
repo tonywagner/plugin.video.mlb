@@ -11,7 +11,9 @@
 <video id="video" controls></video>
 <audio id="audio" controls></audio>
 <span id="audioSpan"></span>
-<button onclick="history.back()">Go Back</button>
+<script>function changeTime(x){video.currentTime+=x}</script>
+<span id="seekSpan"><p>Skip: <button onclick="changeTime(-30)">- 30 s</button> <button onclick="changeTime(-10)">- 10 s</button> <button onclick="changeTime(10)">+ 10 s</button> <button onclick="changeTime(30)">+ 30 s</button> <button onclick="changeTime(90)">+ 90 s</button>  <button onclick="changeTime(120)">+ 120 s</button></span>
+<p><button onclick="history.back()">Go Back</button></p>
 <script>
   element = 'video'
   hls_config = {}
